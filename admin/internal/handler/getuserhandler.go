@@ -3,9 +3,10 @@ package handler
 import (
 	"net/http"
 
-	"admin/internal/logic"
-	"admin/internal/svc"
-	"admin/internal/types"
+	"task/admin/internal/logic"
+	"task/admin/internal/svc"
+	"task/admin/internal/types"
+
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
