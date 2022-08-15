@@ -1,7 +1,8 @@
 package main
 
-import "fmt"
+import "task/service/admin"
 
 func main() {
-	fmt.Println("admin")
+	router := service.NewRouter()
+	_ = router.Run(":8080")
 }

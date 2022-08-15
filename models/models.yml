@@ -1,0 +1,18 @@
+kind: reverse
+name: mydb
+source:
+  database: mysql
+  conn_str: 'root:12345678@(127.0.0.1:3306)/task?charset=utf8mb4'
+targets:
+  - type: codes
+    include_tables:
+    - dag
+    - processor
+    - resource
+    - resource_state
+    table_mapper: snake
+    column_mapper: snake
+    table_prefix: ""
+    multiple_files: true
+    language: golang
+    output_dir: .

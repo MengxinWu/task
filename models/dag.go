@@ -4,11 +4,11 @@ import (
 	"time"
 )
 
-type Resource struct {
-	ResourceId int64     `xorm:"not null pk comment('资源 id') BIGINT"`
-	DagId      int       `xorm:"not null comment('DAG id') INT"`
+type Dag struct {
+	Id         int       `xorm:"not null pk autoincr comment('dag ID') INT"`
 	Name       string    `xorm:"comment('名称') VARCHAR(128)"`
-	Status     int       `xorm:"comment('状态') INT"`
+	Config     string    `xorm:"comment('dag 配置') JSON"`
+	Status     int       `xorm:"comment('dag 状态') INT"`
 	CreateTime time.Time `xorm:"default CURRENT_TIMESTAMP TIMESTAMP"`
 	UpdateTime time.Time `xorm:"default CURRENT_TIMESTAMP TIMESTAMP"`
 }
