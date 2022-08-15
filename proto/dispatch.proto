@@ -1,0 +1,21 @@
+syntax = "proto3";
+package dispatch;
+option go_package = ".;dispatch";
+
+import public "google/protobuf/empty.proto";
+
+
+service DispatchService {
+  rpc Ping(google.protobuf.Empty) returns (DispatchResponse) {}
+  rpc Dispatch(DispatchRequest) returns (DispatchResponse) {}
+}
+
+message DispatchRequest {
+  int64 resource_id = 1;
+}
+
+message DispatchResponse {
+  int64 error_code = 1;
+  string error_msg = 2;
+  string result = 3;
+}
