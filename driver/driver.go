@@ -14,8 +14,8 @@ func init() {
 	var err error
 	user := "root"
 	passwd := "Server.Sues.112"
-	host := "127.0.0.1"
-	port := 43306
+	host := "mysql"
+	port := 3306
 	db := "task"
 	masterDSN := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8mb4", user, passwd, host, port, db)
 	if engine, err = xorm.NewEngine("mysql", masterDSN); err != nil {
