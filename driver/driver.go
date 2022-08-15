@@ -1,17 +1,25 @@
 package driver
 
 import (
-	"context"
-
-	"task/models"
+	"fmt"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/go-xorm/xorm"
 )
 
-// ListDag list dag.
-func ListDag(ctx context.Context) ([]*models.Dag, error) {
+var engine *xorm.Engine
+
+func init() {
 	var err error
-	dags := make([]*models.Dag, 0)
-	if err = engine.Where("status != ?", models.DagStatusDelete).Find(&dags); err != nil {
-		return nil, err
+	user := "root"
+	passwd := "Server.Sues.112"
+	host := "127.0.0.1"
+	port := 43306
+	db := "task"
+	masterDSN := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8mb4", user, passwd, host, port, db)
+	if engine, err = xorm.NewEngine("mysql", masterDSN); err != nil {
+		panic(err)
 	}
-	return dags, nil
+	if err = engine.Ping(); err != nil {
+		panic(err)
+	}
 }
