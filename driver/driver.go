@@ -2,6 +2,8 @@ package driver
 
 import (
 	"fmt"
+	"log"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 )
@@ -17,9 +19,11 @@ func init() {
 	db := "task"
 	masterDSN := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8mb4", user, passwd, host, port, db)
 	if engine, err = xorm.NewEngine("mysql", masterDSN); err != nil {
-		panic(err)
+		//panic(err)
+		log.Printf("error: %v\n", err)
 	}
 	if err = engine.Ping(); err != nil {
-		panic(err)
+		//panic(err)
+		log.Printf("error: %v\n", err)
 	}
 }
