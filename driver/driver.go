@@ -3,7 +3,6 @@ package driver
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
@@ -29,11 +28,11 @@ func initDB() {
 	db := "task"
 	masterDSN := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8mb4", user, passwd, host, port, db)
 	if engine, err = xorm.NewEngine("mysql", masterDSN); err != nil {
-		log.Println(err)
+		fmt.Println(err)
 		panic(err)
 	}
 	if err = engine.Ping(); err != nil {
-		log.Println(err)
+		fmt.Println(err)
 		panic(err)
 	}
 	return
@@ -52,9 +51,9 @@ func initRedis() {
 		DB:       0,
 	})
 	if res, err = client.Ping(context.Background()).Result(); err != nil {
-		log.Println(err)
+		fmt.Println(err)
 		panic(err)
 	}
-	log.Println(res)
+	fmt.Println(res)
 	return
 }
