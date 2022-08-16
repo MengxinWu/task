@@ -40,7 +40,10 @@ func initDB() {
 }
 
 func initRedis() {
-	var err error
+	var (
+		res string
+		err error
+	)
 	redisHost := "redis"
 	redisPort := "6379"
 	client = redis.NewClient(&redis.Options{
@@ -48,9 +51,10 @@ func initRedis() {
 		Password: "Server.Sues.112",
 		DB:       0,
 	})
-	if _, err = client.Ping(context.Background()).Result(); err != nil {
+	if res, err = client.Ping(context.Background()).Result(); err != nil {
 		log.Println(err)
 		panic(err)
 	}
+	log.Println(res)
 	return
 }
