@@ -6,4 +6,5 @@ import (
 
 func main() {
 	dispatch.Ping()
+	select {}
 }
