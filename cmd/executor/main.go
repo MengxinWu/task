@@ -34,5 +34,5 @@ func main() {
 		}(pc)
 	}
 
-	//select {}
+	select {}
 }
