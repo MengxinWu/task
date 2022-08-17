@@ -3,7 +3,7 @@ module task
 go 1.18
 
 require (
-	github.com/Shopify/sarama v1.19.0
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-redis/redis/v8 v8.11.5
 	github.com/go-sql-driver/mysql v1.4.1

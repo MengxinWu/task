@@ -3,7 +3,10 @@ package driver
 import (
 	"context"
 	"fmt"
+	"os"
+	"strconv"
 
+	"github.com/bwmarrin/snowflake"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
@@ -12,11 +15,13 @@ import (
 var (
 	engine *xorm.Engine
 	client *redis.Client
+	node   *snowflake.Node
 )
 
 func init() {
 	initDB()
 	initRedis()
+	initSnowNode()
 }
 
 func initDB() {
@@ -56,4 +61,19 @@ func initRedis() {
 	}
 	fmt.Println(res)
 	return
+}
+
+// initSnowNode init snow node.
+func initSnowNode() {
+	var err error
+	instNo, _ := strconv.ParseInt(os.Getenv("INST_NO"), 10, 64)
+	if node, err = snowflake.NewNode(instNo); err != nil {
+		panic(err)
+	}
+	return
+}
+
+// GetSnowFlakeId get snow id.
+func GetSnowFlakeId() int64 {
+	return node.Generate().Int64()
 }
