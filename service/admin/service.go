@@ -64,6 +64,10 @@ func NewRouter() *gin.Engine {
 			"message": "pong",
 		})
 	})
+	// resource
+	router.POST("/resource", func(c *gin.Context) {
+		AddResource(c)
+	})
 	// resource state
 	router.GET("/resource/state", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
