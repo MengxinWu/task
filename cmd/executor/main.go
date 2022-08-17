@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	consumer, err := sarama.NewConsumer([]string{"kafka1:9092", "kafka2:9093"}, nil)
+	consumer, err := sarama.NewConsumer([]string{"kafka0:9092", "kafka1:9093"}, nil)
 	if err != nil {
 		fmt.Printf("fail to start consumer, err:%v\n", err)
 		return

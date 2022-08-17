@@ -17,7 +17,7 @@ func main() {
 	msg.Topic = "web_log"
 	msg.Value = sarama.StringEncoder("this is a test log")
 	// 连接kafka
-	client, err := sarama.NewSyncProducer([]string{"kafka1:9092", "kafka2:9093"}, config)
+	client, err := sarama.NewSyncProducer([]string{"kafka0:9092", "kafka1:9093"}, config)
 	if err != nil {
 		fmt.Println("producer closed, err:", err)
 		return
