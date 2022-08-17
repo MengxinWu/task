@@ -27,7 +27,7 @@ func main() {
 	msg.Value = sarama.StringEncoder("test:weatherStation device")
 
 	//连接kafka
-	client, err := sarama.NewSyncProducer([]string{"kafka0:9092", "kafka1:9093"}, config)
+	client, err := sarama.NewSyncProducer([]string{"kafka:9092"}, config)
 	if err != nil {
 		fmt.Println("producer closed,err:", err)
 	}

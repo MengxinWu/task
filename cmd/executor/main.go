@@ -11,7 +11,7 @@ var wg sync.WaitGroup
 
 func main() {
 	//创建新的消费者
-	consumer, err := sarama.NewConsumer([]string{"kafka0:9092", "kafka1:9093"}, nil)
+	consumer, err := sarama.NewConsumer([]string{"kafka:9092"}, nil)
 	if err != nil {
 		fmt.Println("fail to start consumer", err)
 	}

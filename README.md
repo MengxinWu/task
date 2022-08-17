@@ -8,9 +8,7 @@
 
 > docker pull wurstmeister/kafka
 
-> docker run -d --name kafka0 --network tasknet --network-alias kafka0 -p 9092:9092 -e KAFKA_BROKER_ID=0 -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka0:9092 -e KAFKA_LISTENERS=PLAINTEXT://kafka0:9092 -t wurstmeister/kafka
-
-> docker run -d --name kafka1 --network tasknet --network-alias kafka1 -p 9093:9093 -e KAFKA_BROKER_ID=1 -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9093 -e KAFKA_LISTENERS=PLAINTEXT://kafka1:9093 -t wurstmeister/kafka
+> docker run -d --name kafka --network tasknet --network-alias kafka -p 9092:9092 -e KAFKA_BROKER_ID=0 -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 -e KAFKA_LISTENERS=PLAINTEXT://kafka:9092 -t wurstmeister/kafka
 
 
 ## admin 任务管理服务
