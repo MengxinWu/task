@@ -1,42 +1,43 @@
 package main
 
 import (
+	"context"
 	"fmt"
-	"sync"
+	"log"
+	"time"
 
-	"github.com/Shopify/sarama"
+	"github.com/segmentio/kafka-go"
 )
 
-var wg sync.WaitGroup
-
 func main() {
-	//创建新的消费者
-	consumer, err := sarama.NewConsumer([]string{"kafka:9092"}, nil)
+	// to consume messages
+	topic := "my-topic"
+	partition := 0
+
+	conn, err := kafka.DialLeader(context.Background(), "tcp", "kafka:9092", topic, partition)
 	if err != nil {
-		fmt.Println("fail to start consumer", err)
+		log.Fatal("failed to dial leader:", err)
 	}
-	//根据topic获取所有的分区列表
-	partitionList, err := consumer.Partitions("weatherStation")
-	if err != nil {
-		fmt.Println("fail to get list of partition,err:", err)
-	}
-	fmt.Println(partitionList)
-	//遍历所有的分区
-	for p := range partitionList {
-		//针对每一个分区创建一个对应分区的消费者
-		pc, err := consumer.ConsumePartition("weatherStation", int32(p), sarama.OffsetNewest)
+
+	conn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	batch := conn.ReadBatch(10e3, 1e6) // fetch 10KB min, 1MB max
+
+	b := make([]byte, 10e3) // 10KB max per message
+	for {
+		n, err := batch.Read(b)
 		if err != nil {
-			fmt.Printf("failed to start consumer for partition %d,err:%v\n", p, err)
+			break
 		}
-		defer pc.AsyncClose()
-		wg.Add(1)
-		//异步从每个分区消费信息
-		go func(sarama.PartitionConsumer) {
-			for msg := range pc.Messages() {
-				fmt.Printf("partition:%d Offse:%d Key:%v Value:%s \n",
-					msg.Partition, msg.Offset, msg.Key, msg.Value)
-			}
-		}(pc)
+		fmt.Println(string(b[:n]))
 	}
-	wg.Wait()
+
+	if err := batch.Close(); err != nil {
+		log.Fatal("failed to close batch:", err)
+	}
+
+	if err := conn.Close(); err != nil {
+		log.Fatal("failed to close connection:", err)
+	}
+
+	select {}
 }

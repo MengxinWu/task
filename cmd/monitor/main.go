@@ -1,44 +1,37 @@
 package main
 
 import (
-	"fmt"
-	"sync"
+	"context"
+	"log"
+	"time"
 
-	"github.com/Shopify/sarama"
+	"github.com/segmentio/kafka-go"
 )
 
-var wg sync.WaitGroup
-
 func main() {
-	config := sarama.NewConfig()
-	//设置
-	//ack应答机制
-	config.Producer.RequiredAcks = sarama.WaitForAll
+	// to produce messages
+	topic := "my-topic"
+	partition := 0
 
-	//发送分区
-	config.Producer.Partitioner = sarama.NewRandomPartitioner
-
-	//回复确认
-	config.Producer.Return.Successes = true
-
-	//构造一个消息
-	msg := &sarama.ProducerMessage{}
-	msg.Topic = "weatherStation"
-	msg.Value = sarama.StringEncoder("test:weatherStation device")
-
-	//连接kafka
-	client, err := sarama.NewSyncProducer([]string{"kafka:9092"}, config)
+	conn, err := kafka.DialLeader(context.Background(), "tcp", "kafka:9092", topic, partition)
 	if err != nil {
-		fmt.Println("producer closed,err:", err)
+		log.Fatal("failed to dial leader:", err)
 	}
-	defer client.Close()
 
-	//发送消息
-	pid, offset, err := client.SendMessage(msg)
+	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	_, err = conn.WriteMessages(
+		kafka.Message{Value: []byte("one!")},
+		kafka.Message{Value: []byte("two!")},
+		kafka.Message{Value: []byte("three!")},
+	)
 	if err != nil {
-		fmt.Println("send msg failed,err:", err)
-		return
+		log.Fatal("failed to write messages:", err)
 	}
-	fmt.Printf("pid:%v offset:%v \n ", pid, offset)
+
+	if err := conn.Close(); err != nil {
+		log.Fatal("failed to close writer:", err)
+	}
+
+	select {}
 
 }
