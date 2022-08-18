@@ -3,6 +3,7 @@ package dispatch
 import (
 	"context"
 
+	"task/driver"
 	"task/models"
 )
 
@@ -23,22 +24,27 @@ type ResourceAddHandler struct {
 }
 
 func (h ResourceAddHandler) Prepare(ctx context.Context, event *models.DispatchEvent) error {
-	// todo resource
-	event.Resource, err = driver.GetReource(ctx, event.ResourceId)
-	// todo dag
-	event.Dag, err = driver.GetDag(ctx, event.DagId)
+	var err error
+	if event.Resource, err = driver.GetResource(ctx, event.ResourceId); err != nil {
+		return err
+	}
+	if event.Dag, err = driver.GetDag(ctx, event.DagId); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (h ResourceAddHandler) Compute(ctx context.Context, event *models.DispatchEvent) error {
-	//
-	event.Graph, err = models.GenerateGraph(event.Dag.Config)
-
-	//
+	var err error
+	if event.Graph, err = models.GenerateGraph(event.Dag.Config); err != nil {
+		return err
+	}
 	for _, node := range event.Graph {
 		if node.Parents == nil {
 			event.ExecutorList = append(event.ExecutorList, int64(node.ProcessorId))
-			// todo 修改resource_state
+			if err = driver.AddProcessor(ctx, event.ResourceId, node.ProcessorId); err != nil {
+				return err
+			}
 		}
 	}
 	return nil

@@ -1,6 +1,8 @@
 package driver
 
 import (
+	"context"
+	"fmt"
 	"time"
 
 	"task/models"
@@ -11,7 +13,7 @@ import (
 // AddResource add resource.
 func AddResource(resourceId int64, dagId int, name string) error {
 	var err error
-	task := &models.Resource{
+	resource := &models.Resource{
 		ResourceId: resourceId,
 		DagId:      dagId,
 		Name:       name,
@@ -19,9 +21,24 @@ func AddResource(resourceId int64, dagId int, name string) error {
 		CreateTime: time.Now(),
 		UpdateTime: time.Now(),
 	}
-	if _, err = engine.Insert(task); err != nil {
-		log.Errorf("AddResource engine error: %v", err)
+	if _, err = engine.Insert(resource); err != nil {
 		return err
 	}
 	return nil
+}
+
+func GetResource(ctx context.Context, resourceId int64) (*models.Resource, error) {
+	var (
+		ok  bool
+		err error
+	)
+	resource := new(models.Resource)
+	if ok, err = engine.Id(resourceId).Get(resource); err != nil {
+		log.Fatalf("GetResource mysql error: %v", err)
+		return nil, err
+	}
+	if !ok {
+		return nil, fmt.Errorf("not exist resource %d", resourceId)
+	}
+	return resource, nil
 }
