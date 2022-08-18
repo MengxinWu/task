@@ -15,6 +15,7 @@ var EventHandlerMap = make(map[string]EventHandler)
 
 func InitEventHandler() {
 	EventHandlerMap["resource_add"] = ResourceAddHandler{}
+	EventHandlerMap["processor_done"] = ProcessorDoneHandler{}
 }
 
 type ResourceAddHandler struct {
@@ -44,5 +45,20 @@ func (h ResourceAddHandler) Compute(ctx context.Context, event *models.DispatchE
 
 func (h ResourceAddHandler) After(ctx context.Context, event *models.DispatchEvent) error {
 	// todo 插入执行的kafka
+	return nil
+}
+
+type ProcessorDoneHandler struct {
+}
+
+func (h ProcessorDoneHandler) Prepare(ctx context.Context, event *models.DispatchEvent) error {
+	return nil
+}
+
+func (h ProcessorDoneHandler) Compute(ctx context.Context, event *models.DispatchEvent) error {
+	return nil
+}
+
+func (h ProcessorDoneHandler) After(ctx context.Context, event *models.DispatchEvent) error {
 	return nil
 }
