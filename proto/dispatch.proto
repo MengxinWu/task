@@ -6,16 +6,21 @@ import public "google/protobuf/empty.proto";
 
 
 service DispatchService {
-  rpc Ping(google.protobuf.Empty) returns (DispatchResponse) {}
+  rpc Ping(google.protobuf.Empty) returns (PingResponse) {}
   rpc Dispatch(DispatchRequest) returns (DispatchResponse) {}
 }
 
+message PingResponse {
+  string message = 1;
+}
+
 message DispatchRequest {
-  int64 resource_id = 1;
+  string event = 1;
+  int64  resource_id = 2;
+  int64  dag_id = 3;
+  int64  processor_id = 4;
 }
 
 message DispatchResponse {
-  int64 error_code = 1;
-  string error_msg = 2;
-  string result = 3;
+  repeated int64 processor_id_list = 1;
 }

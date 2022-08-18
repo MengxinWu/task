@@ -2,6 +2,7 @@ package dispatch
 
 import (
 	"context"
+	"fmt"
 
 	pb "task/pb/dispatch"
 
@@ -12,12 +13,17 @@ type server struct {
 	pb.UnimplementedDispatchServiceServer
 }
 
-func (s *server) Ping(ctx context.Context, in *emptypb.Empty) (*pb.DispatchResponse, error) {
-	return &pb.DispatchResponse{ErrorCode: 2000, ErrorMsg: "ok", Result: ""}, nil
+func (s *server) Ping(ctx context.Context, in *emptypb.Empty) (*pb.PingResponse, error) {
+	return &pb.PingResponse{Message: "ok"}, nil
 }
 
 func (s *server) Dispatch(ctx context.Context, req *pb.DispatchRequest) (*pb.DispatchResponse, error) {
-	return &pb.DispatchResponse{ErrorCode: 2000, ErrorMsg: "ok", Result: ""}, nil
+	fmt.Printf("dispatch reqesut: %v", req)
+
+	// todo 调度算法
+	return &pb.DispatchResponse{
+		ProcessorIdList: []int64{1},
+	}, nil
 }
 
 func NewDispatchService() *server {

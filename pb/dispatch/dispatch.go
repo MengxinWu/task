@@ -20,10 +20,28 @@ func init() {
 	client = NewDispatchServiceClient(conn)
 }
 
-func Ping() {
-	r, err := client.Ping(context.Background(), &Empty{})
+func Ping(ctx context.Context) error {
+	resp, err := client.Ping(ctx, &Empty{})
 	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+		log.Fatalf("ping error: %v", err)
+		return err
 	}
-	log.Printf("result: %s", r)
+	log.Printf("ping result: %+v", resp)
+	return nil
+}
+
+func Dispatch(ctx context.Context, event string, resourceId int64, dagId, processorId int) ([]int64, error) {
+	req := &DispatchRequest{
+		Event:       event,
+		ResourceId:  resourceId,
+		DagId:       int64(dagId),
+		ProcessorId: int64(processorId),
+	}
+	resp, err := client.Dispatch(ctx, req)
+	if err != nil {
+		log.Fatalf("dispatch error: %v", err)
+		return nil, err
+	}
+	log.Printf("dispatch result: %s", resp)
+	return resp.ProcessorIdList, nil
 }

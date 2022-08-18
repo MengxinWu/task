@@ -30,8 +30,58 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 // Empty from public import google/protobuf/empty.proto
 type Empty = emptypb.Empty
 
+type PingResponse struct {
+	Message              string   `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *PingResponse) Reset()         { *m = PingResponse{} }
+func (m *PingResponse) String() string { return proto.CompactTextString(m) }
+func (*PingResponse) ProtoMessage()    {}
+func (*PingResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_b3fbf3dcaa8c6dfa, []int{0}
+}
+func (m *PingResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PingResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PingResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PingResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PingResponse.Merge(m, src)
+}
+func (m *PingResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *PingResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_PingResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PingResponse proto.InternalMessageInfo
+
+func (m *PingResponse) GetMessage() string {
+	if m != nil {
+		return m.Message
+	}
+	return ""
+}
+
 type DispatchRequest struct {
-	ResourceId           int64    `protobuf:"varint,1,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
+	Event                string   `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
+	ResourceId           int64    `protobuf:"varint,2,opt,name=resource_id,json=resourceId,proto3" json:"resource_id,omitempty"`
+	DagId                int64    `protobuf:"varint,3,opt,name=dag_id,json=dagId,proto3" json:"dag_id,omitempty"`
+	ProcessorId          int64    `protobuf:"varint,4,opt,name=processor_id,json=processorId,proto3" json:"processor_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -41,7 +91,7 @@ func (m *DispatchRequest) Reset()         { *m = DispatchRequest{} }
 func (m *DispatchRequest) String() string { return proto.CompactTextString(m) }
 func (*DispatchRequest) ProtoMessage()    {}
 func (*DispatchRequest) Descriptor() ([]byte, []int) {
-	return fileDescriptor_b3fbf3dcaa8c6dfa, []int{0}
+	return fileDescriptor_b3fbf3dcaa8c6dfa, []int{1}
 }
 func (m *DispatchRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -70,6 +120,13 @@ func (m *DispatchRequest) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DispatchRequest proto.InternalMessageInfo
 
+func (m *DispatchRequest) GetEvent() string {
+	if m != nil {
+		return m.Event
+	}
+	return ""
+}
+
 func (m *DispatchRequest) GetResourceId() int64 {
 	if m != nil {
 		return m.ResourceId
@@ -77,10 +134,22 @@ func (m *DispatchRequest) GetResourceId() int64 {
 	return 0
 }
 
+func (m *DispatchRequest) GetDagId() int64 {
+	if m != nil {
+		return m.DagId
+	}
+	return 0
+}
+
+func (m *DispatchRequest) GetProcessorId() int64 {
+	if m != nil {
+		return m.ProcessorId
+	}
+	return 0
+}
+
 type DispatchResponse struct {
-	ErrorCode            int64    `protobuf:"varint,1,opt,name=error_code,json=errorCode,proto3" json:"error_code,omitempty"`
-	ErrorMsg             string   `protobuf:"bytes,2,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
-	Result               string   `protobuf:"bytes,3,opt,name=result,proto3" json:"result,omitempty"`
+	ProcessorIdList      []int64  `protobuf:"varint,1,rep,packed,name=processor_id_list,json=processorIdList,proto3" json:"processor_id_list,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -90,7 +159,7 @@ func (m *DispatchResponse) Reset()         { *m = DispatchResponse{} }
 func (m *DispatchResponse) String() string { return proto.CompactTextString(m) }
 func (*DispatchResponse) ProtoMessage()    {}
 func (*DispatchResponse) Descriptor() ([]byte, []int) {
-	return fileDescriptor_b3fbf3dcaa8c6dfa, []int{1}
+	return fileDescriptor_b3fbf3dcaa8c6dfa, []int{2}
 }
 func (m *DispatchResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
@@ -119,28 +188,15 @@ func (m *DispatchResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_DispatchResponse proto.InternalMessageInfo
 
-func (m *DispatchResponse) GetErrorCode() int64 {
+func (m *DispatchResponse) GetProcessorIdList() []int64 {
 	if m != nil {
-		return m.ErrorCode
+		return m.ProcessorIdList
 	}
-	return 0
-}
-
-func (m *DispatchResponse) GetErrorMsg() string {
-	if m != nil {
-		return m.ErrorMsg
-	}
-	return ""
-}
-
-func (m *DispatchResponse) GetResult() string {
-	if m != nil {
-		return m.Result
-	}
-	return ""
+	return nil
 }
 
 func init() {
+	proto.RegisterType((*PingResponse)(nil), "dispatch.PingResponse")
 	proto.RegisterType((*DispatchRequest)(nil), "dispatch.DispatchRequest")
 	proto.RegisterType((*DispatchResponse)(nil), "dispatch.DispatchResponse")
 }
@@ -148,24 +204,27 @@ func init() {
 func init() { proto.RegisterFile("dispatch.proto", fileDescriptor_b3fbf3dcaa8c6dfa) }
 
 var fileDescriptor_b3fbf3dcaa8c6dfa = []byte{
-	// 269 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x4b, 0xc9, 0x2c, 0x2e,
-	0x48, 0x2c, 0x49, 0xce, 0xd0, 0x2b, 0x28, 0xca, 0x2f, 0xc9, 0x17, 0xe2, 0x80, 0xf1, 0xa5, 0xa4,
-	0xd3, 0xf3, 0xf3, 0xd3, 0x73, 0x52, 0xf5, 0xc1, 0xe2, 0x49, 0xa5, 0x69, 0xfa, 0xa9, 0xb9, 0x05,
-	0x25, 0x95, 0x10, 0x65, 0x4a, 0x46, 0x5c, 0xfc, 0x2e, 0x50, 0x85, 0x41, 0xa9, 0x85, 0xa5, 0xa9,
-	0xc5, 0x25, 0x42, 0xf2, 0x5c, 0xdc, 0x45, 0xa9, 0xc5, 0xf9, 0xa5, 0x45, 0xc9, 0xa9, 0xf1, 0x99,
-	0x29, 0x12, 0x8c, 0x0a, 0x8c, 0x1a, 0xcc, 0x41, 0x5c, 0x30, 0x21, 0xcf, 0x14, 0xa5, 0x34, 0x2e,
-	0x01, 0x84, 0x9e, 0xe2, 0x82, 0xfc, 0xbc, 0xe2, 0x54, 0x21, 0x59, 0x2e, 0xae, 0xd4, 0xa2, 0xa2,
-	0xfc, 0xa2, 0xf8, 0xe4, 0xfc, 0x94, 0x54, 0xa8, 0x1e, 0x4e, 0xb0, 0x88, 0x73, 0x7e, 0x4a, 0xaa,
-	0x90, 0x34, 0x17, 0x84, 0x13, 0x9f, 0x5b, 0x9c, 0x2e, 0xc1, 0xa4, 0xc0, 0xa8, 0xc1, 0x19, 0xc4,
-	0x01, 0x16, 0xf0, 0x2d, 0x4e, 0x17, 0x12, 0xe3, 0x62, 0x2b, 0x4a, 0x2d, 0x2e, 0xcd, 0x29, 0x91,
-	0x60, 0x06, 0xcb, 0x40, 0x79, 0x46, 0x53, 0x18, 0x11, 0x8e, 0x0b, 0x4e, 0x2d, 0x2a, 0xcb, 0x4c,
-	0x4e, 0x15, 0xb2, 0xe1, 0x62, 0x09, 0xc8, 0xcc, 0x4b, 0x17, 0x12, 0xd3, 0x83, 0xf8, 0x4a, 0x0f,
-	0xe6, 0x2b, 0x3d, 0x57, 0x90, 0xaf, 0xa4, 0xa4, 0xf4, 0xe0, 0xe1, 0x80, 0xee, 0x46, 0x25, 0x06,
-	0x21, 0x67, 0x2e, 0x0e, 0x98, 0xa8, 0x90, 0x24, 0x36, 0x95, 0xe0, 0x10, 0xc0, 0x6f, 0x88, 0x93,
-	0xcc, 0x89, 0x47, 0x72, 0x8c, 0x17, 0x1e, 0xc9, 0x31, 0x3e, 0x78, 0x24, 0xc7, 0x38, 0xe3, 0xb1,
-	0x1c, 0x43, 0x14, 0x97, 0x9e, 0x35, 0x4c, 0x43, 0x00, 0x43, 0x12, 0x1b, 0xd8, 0x49, 0xc6, 0x80,
-	0x00, 0x00, 0x00, 0xff, 0xff, 0xaa, 0xa5, 0xc7, 0x84, 0x92, 0x01, 0x00, 0x00,
+	// 318 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x6c, 0x90, 0xcf, 0x4e, 0xc2, 0x40,
+	0x10, 0xc6, 0x59, 0x0b, 0x88, 0x03, 0x11, 0xdd, 0x28, 0xc1, 0x6a, 0x2a, 0xf6, 0xd4, 0x78, 0x28,
+	0x89, 0x5e, 0x4c, 0x4c, 0x3c, 0xf8, 0xe7, 0x40, 0xe2, 0x81, 0xd4, 0x9b, 0x17, 0x52, 0xba, 0xe3,
+	0xba, 0x09, 0xb0, 0x75, 0x77, 0x21, 0xf1, 0xea, 0x13, 0x78, 0xf4, 0x91, 0x3c, 0xfa, 0x08, 0x06,
+	0x5f, 0xc4, 0xb4, 0xb0, 0xd0, 0x18, 0x8f, 0x33, 0xdf, 0x7c, 0x5f, 0xbe, 0xf9, 0xc1, 0x36, 0x13,
+	0x3a, 0x8d, 0x4d, 0xf2, 0x1c, 0xa6, 0x4a, 0x1a, 0x49, 0x6b, 0x76, 0x76, 0x0f, 0xb9, 0x94, 0x7c,
+	0x84, 0xdd, 0x7c, 0x3f, 0x9c, 0x3e, 0x75, 0x71, 0x9c, 0x9a, 0xd7, 0xc5, 0x99, 0x1f, 0x40, 0xa3,
+	0x2f, 0x26, 0x3c, 0x42, 0x9d, 0xca, 0x89, 0x46, 0xda, 0x86, 0xcd, 0x31, 0x6a, 0x1d, 0x73, 0x6c,
+	0x93, 0x0e, 0x09, 0xb6, 0x22, 0x3b, 0xfa, 0x6f, 0x04, 0x9a, 0xb7, 0xcb, 0xcc, 0x08, 0x5f, 0xa6,
+	0xa8, 0x0d, 0xdd, 0x83, 0x0a, 0xce, 0x70, 0x62, 0x96, 0xb7, 0x8b, 0x81, 0x1e, 0x43, 0x5d, 0xa1,
+	0x96, 0x53, 0x95, 0xe0, 0x40, 0xb0, 0xf6, 0x46, 0x87, 0x04, 0x4e, 0x04, 0x76, 0xd5, 0x63, 0x74,
+	0x1f, 0xaa, 0x2c, 0xe6, 0x99, 0xe6, 0xe4, 0x5a, 0x85, 0xc5, 0xbc, 0xc7, 0xe8, 0x09, 0x34, 0x52,
+	0x25, 0x13, 0xd4, 0x5a, 0xaa, 0x4c, 0x2c, 0xe7, 0x62, 0x7d, 0xb5, 0xeb, 0x31, 0xff, 0x0a, 0x76,
+	0xd6, 0x1d, 0x96, 0x95, 0x4f, 0x61, 0xb7, 0x68, 0x1b, 0x8c, 0x84, 0xce, 0x0a, 0x39, 0x81, 0x13,
+	0x35, 0x0b, 0xde, 0x7b, 0xa1, 0xcd, 0xd9, 0x7b, 0xe1, 0x89, 0x07, 0x54, 0x33, 0x91, 0x20, 0xbd,
+	0x80, 0x72, 0x86, 0x80, 0xb6, 0xc2, 0x05, 0xa8, 0xd0, 0x82, 0x0a, 0xef, 0x32, 0x50, 0x6e, 0x2b,
+	0x5c, 0xa1, 0x2d, 0xa2, 0xf2, 0x4b, 0xf4, 0x06, 0x6a, 0x36, 0x8c, 0x1e, 0xac, 0xaf, 0xfe, 0x50,
+	0x72, 0xdd, 0xff, 0x24, 0x1b, 0x72, 0x7d, 0xf4, 0x39, 0xf7, 0xc8, 0xd7, 0xdc, 0x23, 0xdf, 0x73,
+	0x8f, 0x7c, 0xfc, 0x78, 0xa5, 0x47, 0x08, 0x2f, 0xad, 0xa1, 0x5f, 0x1a, 0x56, 0xf3, 0x3a, 0xe7,
+	0xbf, 0x01, 0x00, 0x00, 0xff, 0xff, 0xae, 0x98, 0x4e, 0xaf, 0xe1, 0x01, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -180,7 +239,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type DispatchServiceClient interface {
-	Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DispatchResponse, error)
+	Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PingResponse, error)
 	Dispatch(ctx context.Context, in *DispatchRequest, opts ...grpc.CallOption) (*DispatchResponse, error)
 }
 
@@ -192,8 +251,8 @@ func NewDispatchServiceClient(cc *grpc.ClientConn) DispatchServiceClient {
 	return &dispatchServiceClient{cc}
 }
 
-func (c *dispatchServiceClient) Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*DispatchResponse, error) {
-	out := new(DispatchResponse)
+func (c *dispatchServiceClient) Ping(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*PingResponse, error) {
+	out := new(PingResponse)
 	err := c.cc.Invoke(ctx, "/dispatch.DispatchService/Ping", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -212,7 +271,7 @@ func (c *dispatchServiceClient) Dispatch(ctx context.Context, in *DispatchReques
 
 // DispatchServiceServer is the server API for DispatchService service.
 type DispatchServiceServer interface {
-	Ping(context.Context, *emptypb.Empty) (*DispatchResponse, error)
+	Ping(context.Context, *emptypb.Empty) (*PingResponse, error)
 	Dispatch(context.Context, *DispatchRequest) (*DispatchResponse, error)
 }
 
@@ -220,7 +279,7 @@ type DispatchServiceServer interface {
 type UnimplementedDispatchServiceServer struct {
 }
 
-func (*UnimplementedDispatchServiceServer) Ping(ctx context.Context, req *emptypb.Empty) (*DispatchResponse, error) {
+func (*UnimplementedDispatchServiceServer) Ping(ctx context.Context, req *emptypb.Empty) (*PingResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Ping not implemented")
 }
 func (*UnimplementedDispatchServiceServer) Dispatch(ctx context.Context, req *DispatchRequest) (*DispatchResponse, error) {
@@ -284,6 +343,40 @@ var _DispatchService_serviceDesc = grpc.ServiceDesc{
 	Metadata: "dispatch.proto",
 }
 
+func (m *PingResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PingResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PingResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if len(m.Message) > 0 {
+		i -= len(m.Message)
+		copy(dAtA[i:], m.Message)
+		i = encodeVarintDispatch(dAtA, i, uint64(len(m.Message)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func (m *DispatchRequest) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
 	dAtA = make([]byte, size)
@@ -308,10 +401,27 @@ func (m *DispatchRequest) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
+	if m.ProcessorId != 0 {
+		i = encodeVarintDispatch(dAtA, i, uint64(m.ProcessorId))
+		i--
+		dAtA[i] = 0x20
+	}
+	if m.DagId != 0 {
+		i = encodeVarintDispatch(dAtA, i, uint64(m.DagId))
+		i--
+		dAtA[i] = 0x18
+	}
 	if m.ResourceId != 0 {
 		i = encodeVarintDispatch(dAtA, i, uint64(m.ResourceId))
 		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0x10
+	}
+	if len(m.Event) > 0 {
+		i -= len(m.Event)
+		copy(dAtA[i:], m.Event)
+		i = encodeVarintDispatch(dAtA, i, uint64(len(m.Event)))
+		i--
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -340,24 +450,24 @@ func (m *DispatchResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
-	if len(m.Result) > 0 {
-		i -= len(m.Result)
-		copy(dAtA[i:], m.Result)
-		i = encodeVarintDispatch(dAtA, i, uint64(len(m.Result)))
+	if len(m.ProcessorIdList) > 0 {
+		dAtA2 := make([]byte, len(m.ProcessorIdList)*10)
+		var j1 int
+		for _, num1 := range m.ProcessorIdList {
+			num := uint64(num1)
+			for num >= 1<<7 {
+				dAtA2[j1] = uint8(uint64(num)&0x7f | 0x80)
+				num >>= 7
+				j1++
+			}
+			dAtA2[j1] = uint8(num)
+			j1++
+		}
+		i -= j1
+		copy(dAtA[i:], dAtA2[:j1])
+		i = encodeVarintDispatch(dAtA, i, uint64(j1))
 		i--
-		dAtA[i] = 0x1a
-	}
-	if len(m.ErrorMsg) > 0 {
-		i -= len(m.ErrorMsg)
-		copy(dAtA[i:], m.ErrorMsg)
-		i = encodeVarintDispatch(dAtA, i, uint64(len(m.ErrorMsg)))
-		i--
-		dAtA[i] = 0x12
-	}
-	if m.ErrorCode != 0 {
-		i = encodeVarintDispatch(dAtA, i, uint64(m.ErrorCode))
-		i--
-		dAtA[i] = 0x8
+		dAtA[i] = 0xa
 	}
 	return len(dAtA) - i, nil
 }
@@ -373,14 +483,40 @@ func encodeVarintDispatch(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
+func (m *PingResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Message)
+	if l > 0 {
+		n += 1 + l + sovDispatch(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
 func (m *DispatchRequest) Size() (n int) {
 	if m == nil {
 		return 0
 	}
 	var l int
 	_ = l
+	l = len(m.Event)
+	if l > 0 {
+		n += 1 + l + sovDispatch(uint64(l))
+	}
 	if m.ResourceId != 0 {
 		n += 1 + sovDispatch(uint64(m.ResourceId))
+	}
+	if m.DagId != 0 {
+		n += 1 + sovDispatch(uint64(m.DagId))
+	}
+	if m.ProcessorId != 0 {
+		n += 1 + sovDispatch(uint64(m.ProcessorId))
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -394,16 +530,12 @@ func (m *DispatchResponse) Size() (n int) {
 	}
 	var l int
 	_ = l
-	if m.ErrorCode != 0 {
-		n += 1 + sovDispatch(uint64(m.ErrorCode))
-	}
-	l = len(m.ErrorMsg)
-	if l > 0 {
-		n += 1 + l + sovDispatch(uint64(l))
-	}
-	l = len(m.Result)
-	if l > 0 {
-		n += 1 + l + sovDispatch(uint64(l))
+	if len(m.ProcessorIdList) > 0 {
+		l = 0
+		for _, e := range m.ProcessorIdList {
+			l += sovDispatch(uint64(e))
+		}
+		n += 1 + sovDispatch(uint64(l)) + l
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -416,6 +548,89 @@ func sovDispatch(x uint64) (n int) {
 }
 func sozDispatch(x uint64) (n int) {
 	return sovDispatch(uint64((x << 1) ^ uint64((int64(x) >> 63))))
+}
+func (m *PingResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowDispatch
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PingResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PingResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Message", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDispatch
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDispatch
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDispatch
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Message = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipDispatch(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthDispatch
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
 }
 func (m *DispatchRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
@@ -447,6 +662,38 @@ func (m *DispatchRequest) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Event", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDispatch
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthDispatch
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthDispatch
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Event = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ResourceId", wireType)
 			}
@@ -461,6 +708,44 @@ func (m *DispatchRequest) Unmarshal(dAtA []byte) error {
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.ResourceId |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 3:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DagId", wireType)
+			}
+			m.DagId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDispatch
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.DagId |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProcessorId", wireType)
+			}
+			m.ProcessorId = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowDispatch
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.ProcessorId |= int64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}
@@ -517,88 +802,81 @@ func (m *DispatchResponse) Unmarshal(dAtA []byte) error {
 		}
 		switch fieldNum {
 		case 1:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ErrorCode", wireType)
-			}
-			m.ErrorCode = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDispatch
+			if wireType == 0 {
+				var v int64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowDispatch
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					v |= int64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
 				}
-				if iNdEx >= l {
+				m.ProcessorIdList = append(m.ProcessorIdList, v)
+			} else if wireType == 2 {
+				var packedLen int
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return ErrIntOverflowDispatch
+					}
+					if iNdEx >= l {
+						return io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					packedLen |= int(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				if packedLen < 0 {
+					return ErrInvalidLengthDispatch
+				}
+				postIndex := iNdEx + packedLen
+				if postIndex < 0 {
+					return ErrInvalidLengthDispatch
+				}
+				if postIndex > l {
 					return io.ErrUnexpectedEOF
 				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.ErrorCode |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
+				var elementCount int
+				var count int
+				for _, integer := range dAtA[iNdEx:postIndex] {
+					if integer < 128 {
+						count++
+					}
 				}
-			}
-		case 2:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field ErrorMsg", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDispatch
+				elementCount = count
+				if elementCount != 0 && len(m.ProcessorIdList) == 0 {
+					m.ProcessorIdList = make([]int64, 0, elementCount)
 				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
+				for iNdEx < postIndex {
+					var v int64
+					for shift := uint(0); ; shift += 7 {
+						if shift >= 64 {
+							return ErrIntOverflowDispatch
+						}
+						if iNdEx >= l {
+							return io.ErrUnexpectedEOF
+						}
+						b := dAtA[iNdEx]
+						iNdEx++
+						v |= int64(b&0x7F) << shift
+						if b < 0x80 {
+							break
+						}
+					}
+					m.ProcessorIdList = append(m.ProcessorIdList, v)
 				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
+			} else {
+				return fmt.Errorf("proto: wrong wireType = %d for field ProcessorIdList", wireType)
 			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDispatch
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDispatch
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.ErrorMsg = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
-		case 3:
-			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field Result", wireType)
-			}
-			var stringLen uint64
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflowDispatch
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				stringLen |= uint64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-			intStringLen := int(stringLen)
-			if intStringLen < 0 {
-				return ErrInvalidLengthDispatch
-			}
-			postIndex := iNdEx + intStringLen
-			if postIndex < 0 {
-				return ErrInvalidLengthDispatch
-			}
-			if postIndex > l {
-				return io.ErrUnexpectedEOF
-			}
-			m.Result = string(dAtA[iNdEx:postIndex])
-			iNdEx = postIndex
 		default:
 			iNdEx = preIndex
 			skippy, err := skipDispatch(dAtA[iNdEx:])
