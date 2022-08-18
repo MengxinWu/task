@@ -21,7 +21,7 @@ func main() {
 		MaxBytes: 10e6, // 10MB
 	})
 
-	// 监听kafka消息
+	// 监听kafka消息(调度)
 	for {
 		ctx := context.Background()
 		m, err := r.ReadMessage(ctx)
