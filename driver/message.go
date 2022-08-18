@@ -40,8 +40,8 @@ func SendExecuteEventMsg(events []*models.ExecuteEvent) error {
 		log.Printf("SendExecuteEventMsg msg: %s", string(msg))
 		msgs = append(msgs, kafka.Message{Value: msg})
 	}
-	_ = dispatchConn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	if _, err = dispatchConn.WriteMessages(msgs...); err != nil {
+	_ = executeConn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	if _, err = executeConn.WriteMessages(msgs...); err != nil {
 		log.Printf("SendExecuteEventMsg send msg error(%v)", err)
 		return err
 	}
