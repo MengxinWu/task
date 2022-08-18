@@ -2,8 +2,6 @@ package dispatch
 
 import (
 	"context"
-	"fmt"
-
 	pb "task/pb/dispatch"
 
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -18,9 +16,6 @@ func (s *server) Ping(ctx context.Context, in *emptypb.Empty) (*pb.PingResponse,
 }
 
 func (s *server) Dispatch(ctx context.Context, req *pb.DispatchRequest) (*pb.DispatchResponse, error) {
-	fmt.Println("dispatch!!!")
-	fmt.Printf("dispatch reqesut: %v", req)
-
 	// todo 调度算法
 	return &pb.DispatchResponse{
 		ProcessorIdList: []int64{1},
