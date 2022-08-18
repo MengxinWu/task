@@ -2,7 +2,7 @@ echo "start build docker images..."
 docker build -t admin:beta -f dockers/admin.Dockerfile .
 docker build -t dispatch:beta -f dockers/dispatch.Dockerfile .
 docker build -t monitor:beta -f dockers/monitor.Dockerfile .
-docker build -t monitor:beta -f dockers/monitor.Dockerfile .
+docker build -t executor:beta -f dockers/executor.Dockerfile .
 
 echo "remove docker container..."
 docker rm -f task_admin task_dispatch task_monitor task_executor
