@@ -10,5 +10,5 @@ WORKDIR /task/cmd/dispatch
 RUN cd /task/cmd/dispatch
 RUN go env -w GO111MODULE=on && go env -w GOPROXY="https://goproxy.cn,direct"
 
-RUN go mod tidy && go mod verify && go build -o dispatch
+RUN go mod tidy && go build -o dispatch
 CMD ["./dispatch"]
