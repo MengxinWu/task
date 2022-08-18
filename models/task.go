@@ -11,13 +11,13 @@ type Node struct {
 	Children    []*Node
 }
 
-type DAG map[int]*Node
+type Graph map[int]*Node
 
-func (d DAG) AddNode(processorId int) {
+func (d Graph) AddNode(processorId int) {
 	d[processorId] = &Node{ProcessorId: processorId}
 }
 
-func (d DAG) AddEdge(relation []int) {
+func (d Graph) AddEdge(relation []int) {
 	from := relation[0]
 	to := relation[1]
 	d[from].Children = append(d[from].Children, d[to])
@@ -29,15 +29,15 @@ type DagConfig struct {
 	Relations  [][]int `json:"relations"`
 }
 
-// GenerateDAG generate DAG.
-func GenerateDAG(dagConfig string) (DAG, error) {
+// GenerateGraph generate Graph.
+func GenerateGraph(dagConfig string) (Graph, error) {
 	var err error
 	config := new(DagConfig)
 	if err = json.Unmarshal([]byte(dagConfig), &config); err != nil {
 		return nil, err
 	}
 	fmt.Printf("dag config: %v\n", config)
-	dag := make(DAG)
+	dag := make(Graph)
 	for _, processorId := range config.Processors {
 		dag.AddNode(processorId)
 	}

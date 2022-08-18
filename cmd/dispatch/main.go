@@ -12,6 +12,8 @@ import (
 )
 
 func main() {
+	service.InitEventHandler()
+
 	lis, err := net.Listen("tcp", fmt.Sprintf(":50051"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
