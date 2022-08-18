@@ -36,6 +36,7 @@ func (h ResourceAddHandler) Compute(ctx context.Context, event *models.DispatchE
 	for _, node := range event.Graph {
 		if node.Parents == nil {
 			event.ExecutorList = append(event.ExecutorList, int64(node.ProcessorId))
+			// todo 修改resource_state
 		}
 	}
 	return nil
