@@ -19,7 +19,7 @@ func (s *server) Ping(ctx context.Context, in *emptypb.Empty) (*pb.PingResponse,
 
 func (s *server) Dispatch(ctx context.Context, req *pb.DispatchRequest) (*pb.DispatchResponse, error) {
 	var (
-		hdl EventHandler
+		hdl DispatchHandler
 		ok  bool
 		err error
 	)

@@ -3,28 +3,26 @@ package driver
 import (
 	"context"
 	"fmt"
-	"os"
-	"strconv"
+	"task/models"
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/go-redis/redis/v8"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
+	"github.com/segmentio/kafka-go"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
-	engine *xorm.Engine
-	client *redis.Client
-	node   *snowflake.Node
+	engine       *xorm.Engine
+	client       *redis.Client
+	node         *snowflake.Node
+	dispatchConn *kafka.Conn
+	executeConn  *kafka.Conn
 )
 
-func init() {
-	initDB()
-	initRedis()
-	initSnowNode()
-}
-
-func initDB() {
+// InitEngine init engine.
+func InitEngine() {
 	var err error
 	user := "root"
 	passwd := "Server.Sues.112"
@@ -33,47 +31,75 @@ func initDB() {
 	db := "task"
 	masterDSN := fmt.Sprintf("%s:%s@(%s:%d)/%s?charset=utf8mb4", user, passwd, host, port, db)
 	if engine, err = xorm.NewEngine("mysql", masterDSN); err != nil {
-		fmt.Println(err)
-		panic(err)
+		log.Panic(err)
 	}
 	if err = engine.Ping(); err != nil {
-		fmt.Println(err)
-		panic(err)
+		log.Panic(err)
 	}
+	log.Printf("init engine success...")
 	return
 }
 
-func initRedis() {
+// InitRedis init redis.
+func InitRedis() {
 	var (
-		res string
-		err error
+		ctx    = context.Background()
+		result string
+		err    error
 	)
 	redisHost := "redis"
 	redisPort := "6379"
+	passwd := "Server.Sues.112"
 	client = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%s", redisHost, redisPort),
-		Password: "Server.Sues.112",
+		Password: passwd,
 		DB:       0,
 	})
-	if res, err = client.Ping(context.Background()).Result(); err != nil {
-		fmt.Println(err)
-		panic(err)
+	if result, err = client.Ping(ctx).Result(); err != nil {
+		log.Panic(err)
 	}
-	fmt.Println(res)
+	log.Printf("redis ping result: %s", result)
+	log.Printf("init redis success...")
 	return
 }
 
-// initSnowNode init snow node.
-func initSnowNode() {
+// InitSnowNode init snow node.
+func InitSnowNode() {
 	var err error
-	instNo, _ := strconv.ParseInt(os.Getenv("INST_NO"), 10, 64)
-	if node, err = snowflake.NewNode(instNo); err != nil {
-		panic(err)
+	if node, err = snowflake.NewNode(0); err != nil {
+		log.Panic(err)
 	}
+	log.Printf("init snow node success...")
 	return
 }
 
 // GetSnowFlakeId get snow id.
 func GetSnowFlakeId() int64 {
 	return node.Generate().Int64()
+}
+
+// InitDispatchConn init dispatch conn.
+func InitDispatchConn() {
+	var (
+		ctx = context.Background()
+		err error
+	)
+	if dispatchConn, err = kafka.DialLeader(ctx, "tcp", models.KafkaAddress, models.KafkaTopicDispatch, 0); err != nil {
+		log.Panic(err)
+	}
+	log.Printf("init dispatch conn success...")
+	return
+}
+
+// InitExecuteConn init execute conn.
+func InitExecuteConn() {
+	var (
+		ctx = context.Background()
+		err error
+	)
+	if executeConn, err = kafka.DialLeader(ctx, "tcp", models.KafkaAddress, models.KafkaTopicExecute, 0); err != nil {
+		log.Panic(err)
+	}
+	log.Printf("init execute conn success...")
+	return
 }

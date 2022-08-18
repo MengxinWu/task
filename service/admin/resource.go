@@ -1,36 +1,37 @@
 package service
 
 import (
-	"fmt"
+	"task/driver"
 	"task/models"
 
-	"task/driver"
-
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
-type AddResourceReq struct {
-	DagId int    `json:"dag_id"`
-	Name  string `json:"name"`
-}
-
 // AddResource add resource.
-func AddResource(c *gin.Context) {
-	var err error
-
-	req := new(AddResourceReq)
-	if err = c.BindJSON(req); err != nil {
-		fmt.Println(err)
+func AddResource(c *gin.Context) (interface{}, error) {
+	var (
+		resourceId int64
+		err        error
+	)
+	// 解析参数
+	request := new(models.AddResourceRequest)
+	if err = c.BindJSON(request); err != nil {
+		log.Errorf("AddResource bind json request error(%v)", err)
+		return nil, err
 	}
-	resourceId := driver.GetSnowFlakeId()
-	err = driver.AddResource(c, resourceId, req.DagId, req.Name)
-
-	// 放入消息队列 kafka
-	dispatchEvent := &models.DispatchEvent{
-		Event:      models.EventResourceAdd,
+	// resource 入库
+	resourceId = driver.GetSnowFlakeId()
+	if err = driver.AddResource(resourceId, request.DagId, request.Name); err != nil {
+		return nil, err
+	}
+	// 进入调度消息队列 等待调度
+	if err = driver.SendDispatchEventMsg(&models.DispatchEvent{
+		Event:      models.DispatchEventResourceAdd,
 		ResourceId: resourceId,
-		DagId:      req.DagId,
+		DagId:      request.DagId,
+	}); err != nil {
+		return nil, err
 	}
-	err = driver.InsertDispatchEvent(dispatchEvent)
-	HttpResponse(c, resourceId, err)
+	return resourceId, nil
 }

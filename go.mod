@@ -10,6 +10,7 @@ require (
 	github.com/go-xorm/xorm v0.7.9
 	github.com/golang/protobuf v1.5.2
 	github.com/segmentio/kafka-go v0.4.34
+	github.com/sirupsen/logrus v1.2.0
 	google.golang.org/grpc v1.48.0
 	google.golang.org/protobuf v1.28.0
 )

@@ -1,7 +1,7 @@
 package models
 
 const (
-	EventResourceAdd = "resource_add"
+	DispatchEventResourceAdd = "resource_add"
 )
 
 type DispatchEvent struct {
@@ -12,8 +12,8 @@ type DispatchEvent struct {
 	ProcessorId int    `json:"processor_id"`
 	//
 	Resource *Resource `json:"-"`
-	Dag      *Dag      `json:"dag"`
-	Graph    Graph     `json:"graph"`
+	Dag      *Dag      `json:"-"`
+	Graph    Graph     `json:"-"`
 
 	//
 	ExecutorList []int64 `json:"-"`

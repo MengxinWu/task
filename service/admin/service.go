@@ -66,7 +66,8 @@ func NewRouter() *gin.Engine {
 	})
 	// resource
 	router.POST("/resource", func(c *gin.Context) {
-		AddResource(c)
+		result, err := AddResource(c)
+		HttpResponse(c, result, err)
 	})
 	// resource state
 	router.GET("/resource/state", func(c *gin.Context) {

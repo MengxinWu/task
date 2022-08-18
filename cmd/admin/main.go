@@ -1,8 +1,17 @@
 package main
 
-import "task/service/admin"
+import (
+	"task/driver"
+	"task/service/admin"
+)
 
 func main() {
+	// 初始化资源
+	driver.InitEngine()
+	driver.InitSnowNode()
+	driver.InitDispatchConn()
+
+	// 创建并运行gin服务
 	router := service.NewRouter()
 	_ = router.Run(":8080")
 }

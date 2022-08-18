@@ -2,11 +2,14 @@ package dispatch
 
 import (
 	"context"
-	"fmt"
-	"log"
 
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+)
+
+const (
+	GrpcAddress = "task_dispatch:50051"
 )
 
 var (
@@ -14,24 +17,27 @@ var (
 )
 
 func init() {
-	conn, err := grpc.Dial("task_dispatch:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(GrpcAddress, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		log.Panic(err)
 	}
 	client = NewDispatchServiceClient(conn)
-	fmt.Println("init dispatch client")
+	log.Printf("init dispatch client success...")
+	return
 }
 
+// Ping ping.
 func Ping(ctx context.Context) error {
 	resp, err := client.Ping(ctx, &Empty{})
 	if err != nil {
-		log.Fatalf("ping error: %v", err)
+		log.Errorf("ping rpc error: %v", err)
 		return err
 	}
-	log.Printf("ping result: %+v", resp)
+	log.Printf("ping rpc result: %+v", resp)
 	return nil
 }
 
+// Dispatch dispatch.
 func Dispatch(ctx context.Context, event string, resourceId int64, dagId, processorId int) ([]int64, error) {
 	req := &DispatchRequest{
 		Event:       event,
@@ -41,9 +47,9 @@ func Dispatch(ctx context.Context, event string, resourceId int64, dagId, proces
 	}
 	resp, err := client.Dispatch(ctx, req)
 	if err != nil {
-		log.Fatalf("dispatch error: %v", err)
+		log.Errorf("dispatch rpc error: %v", err)
 		return nil, err
 	}
-	log.Printf("dispatch result: %s", resp)
+	log.Printf("dispatch rpc result: %s", resp)
 	return resp.ProcessorIdList, nil
 }

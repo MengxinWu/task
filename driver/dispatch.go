@@ -1,36 +1,29 @@
 package driver
 
 import (
-	"context"
 	"encoding/json"
-	"github.com/segmentio/kafka-go"
-	"log"
-	"task/models"
 	"time"
+
+	"task/models"
+
+	"github.com/segmentio/kafka-go"
+	log "github.com/sirupsen/logrus"
 )
 
-func InsertDispatchEvent(event *models.DispatchEvent) error {
-	// to produce messages
-	topic := "dispatch-topic"
-	partition := 0
-
-	conn, err := kafka.DialLeader(context.Background(), "tcp", "kafka:9092", topic, partition)
-	if err != nil {
-		log.Fatal("failed to dial leader:", err)
-	}
-
-	dataJson, _ := json.Marshal(event)
-
-	conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	_, err = conn.WriteMessages(
-		kafka.Message{Value: dataJson},
+// SendDispatchEventMsg send dispatch event msg.
+func SendDispatchEventMsg(event *models.DispatchEvent) error {
+	var (
+		msg []byte
+		err error
 	)
-	if err != nil {
-		log.Fatal("failed to write messages:", err)
-	}
-
-	if err := conn.Close(); err != nil {
-		log.Fatal("failed to close writer:", err)
+	msg, _ = json.Marshal(event)
+	log.Printf("SendDispatchEventMsg msg: %s", string(msg))
+	_ = dispatchConn.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	if _, err = dispatchConn.WriteMessages(
+		kafka.Message{Value: msg},
+	); err != nil {
+		log.Printf("SendDispatchEventMsg send msg error(%v)", err)
+		return err
 	}
 	return nil
 }

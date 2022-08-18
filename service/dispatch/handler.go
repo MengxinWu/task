@@ -2,18 +2,19 @@ package dispatch
 
 import (
 	"context"
+
 	"task/models"
 )
 
-type EventHandler interface {
+type DispatchHandler interface {
 	Prepare(context.Context, *models.DispatchEvent) error
 	Compute(context.Context, *models.DispatchEvent) error
 	After(context.Context, *models.DispatchEvent) error
 }
 
-var EventHandlerMap = make(map[string]EventHandler)
+var EventHandlerMap = make(map[string]DispatchHandler)
 
-func InitEventHandler() {
+func InitDispatchHandler() {
 	EventHandlerMap["resource_add"] = ResourceAddHandler{}
 	EventHandlerMap["processor_done"] = ProcessorDoneHandler{}
 }
