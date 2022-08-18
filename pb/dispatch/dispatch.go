@@ -2,6 +2,7 @@ package dispatch
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"google.golang.org/grpc"
@@ -18,6 +19,7 @@ func init() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	client = NewDispatchServiceClient(conn)
+	fmt.Println("init dispatch client")
 }
 
 func Ping(ctx context.Context) error {
