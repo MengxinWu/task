@@ -13,11 +13,11 @@ type DispatchHandler interface {
 	After(context.Context, *models.DispatchEvent) error
 }
 
-var EventHandlerMap = make(map[string]DispatchHandler)
+var DispatchHandlerMap = make(map[string]DispatchHandler)
 
 func InitDispatchHandler() {
-	EventHandlerMap["resource_add"] = ResourceAddHandler{}
-	EventHandlerMap["processor_done"] = ProcessorDoneHandler{}
+	DispatchHandlerMap["resource_add"] = ResourceAddHandler{}
+	DispatchHandlerMap["processor_done"] = ProcessorDoneHandler{}
 }
 
 type ResourceAddHandler struct {
@@ -36,13 +36,16 @@ func (h ResourceAddHandler) Prepare(ctx context.Context, event *models.DispatchE
 
 func (h ResourceAddHandler) Compute(ctx context.Context, event *models.DispatchEvent) error {
 	var err error
+	// 生成DAG图
 	if event.Graph, err = models.GenerateGraph(event.Dag.Config); err != nil {
 		return err
 	}
+	// 计算根处理单元
 	for _, node := range event.Graph {
 		if node.Parents == nil {
 			event.ExecutorList = append(event.ExecutorList, int64(node.ProcessorId))
-			if err = driver.AddProcessor(ctx, event.ResourceId, node.ProcessorId); err != nil {
+			// 设置处理状态为等待执行
+			if err = driver.AddProcessState(ctx, event.ResourceId, node.ProcessorId, models.ProcessStateReady); err != nil {
 				return err
 			}
 		}
@@ -50,22 +53,38 @@ func (h ResourceAddHandler) Compute(ctx context.Context, event *models.DispatchE
 	return nil
 }
 
-func (h ResourceAddHandler) After(ctx context.Context, event *models.DispatchEvent) error {
-	// todo 插入执行的kafka
+func (h ResourceAddHandler) After(_ context.Context, event *models.DispatchEvent) error {
+	var (
+		executeEvents []*models.ExecuteEvent
+		err           error
+	)
+	if len(event.ExecutorList) == 0 {
+		return nil
+	}
+	// 进入执行消息队列 等待执行
+	for _, processorId := range event.ExecutorList {
+		executeEvents = append(executeEvents, &models.ExecuteEvent{
+			ResourceId:  event.ResourceId,
+			ProcessorId: int(processorId),
+		})
+	}
+	if err = driver.SendExecuteEventMsg(executeEvents); err != nil {
+		return err
+	}
 	return nil
 }
 
 type ProcessorDoneHandler struct {
 }
 
-func (h ProcessorDoneHandler) Prepare(ctx context.Context, event *models.DispatchEvent) error {
+func (h ProcessorDoneHandler) Prepare(_ context.Context, _ *models.DispatchEvent) error {
 	return nil
 }
 
-func (h ProcessorDoneHandler) Compute(ctx context.Context, event *models.DispatchEvent) error {
+func (h ProcessorDoneHandler) Compute(_ context.Context, _ *models.DispatchEvent) error {
 	return nil
 }
 
-func (h ProcessorDoneHandler) After(ctx context.Context, event *models.DispatchEvent) error {
+func (h ProcessorDoneHandler) After(_ context.Context, _ *models.DispatchEvent) error {
 	return nil
 }

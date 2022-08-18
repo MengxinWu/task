@@ -13,7 +13,7 @@ type server struct {
 	pb.UnimplementedDispatchServiceServer
 }
 
-func (s *server) Ping(ctx context.Context, in *emptypb.Empty) (*pb.PingResponse, error) {
+func (s *server) Ping(_ context.Context, _ *emptypb.Empty) (*pb.PingResponse, error) {
 	return &pb.PingResponse{Message: "ok"}, nil
 }
 
@@ -31,7 +31,7 @@ func (s *server) Dispatch(ctx context.Context, req *pb.DispatchRequest) (*pb.Dis
 		ProcessorId: int(req.ProcessorId),
 	}
 
-	if hdl, ok = EventHandlerMap[req.Event]; !ok {
+	if hdl, ok = DispatchHandlerMap[req.Event]; !ok {
 		return nil, fmt.Errorf("event not exist: %s", req.Event)
 	}
 

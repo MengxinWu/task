@@ -22,19 +22,21 @@ func AddResource(resourceId int64, dagId int, name string) error {
 		UpdateTime: time.Now(),
 	}
 	if _, err = engine.Insert(resource); err != nil {
+		log.Errorf("AddResource engine error: %v", err)
 		return err
 	}
 	return nil
 }
 
-func GetResource(ctx context.Context, resourceId int64) (*models.Resource, error) {
+// GetResource get resource.
+func GetResource(_ context.Context, resourceId int64) (*models.Resource, error) {
 	var (
 		ok  bool
 		err error
 	)
 	resource := new(models.Resource)
 	if ok, err = engine.Id(resourceId).Get(resource); err != nil {
-		log.Fatalf("GetResource mysql error: %v", err)
+		log.Errorf("GetResource engine error: %v", err)
 		return nil, err
 	}
 	if !ok {
