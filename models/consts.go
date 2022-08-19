@@ -9,7 +9,7 @@ const (
 	ProcessStateInit    = 0
 	ProcessStateReady   = 100
 	ProcessStateRunning = 200
-	ProcessStateFinish  = 400
+	ProcessStateSuccess = 400
 	ProcessStateFail    = 500
 	ProcessStateError   = 600
 )

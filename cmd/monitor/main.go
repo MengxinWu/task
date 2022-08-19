@@ -31,8 +31,8 @@ func main() {
 		log.Printf("message at topic/partition/offset %v/%v/%v: %s = %s", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 		event := new(models.DispatchEvent)
 		if err = json.Unmarshal(m.Value, &event); err != nil {
-			log.Errorf("message error: %v", err)
-			return
+			log.Errorf("message unmarshal error: %v", err)
+			break
 		}
 		// 调用调度rpc接口
 		if _, err = dispatch.Dispatch(ctx, event.Event, event.ResourceId, event.DagId, event.ProcessorId); err != nil {

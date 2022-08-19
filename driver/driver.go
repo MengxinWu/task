@@ -103,3 +103,14 @@ func InitExecuteConn() {
 	log.Printf("init execute conn success...")
 	return
 }
+
+// CreateExecuteConsumer create execute consumer.
+func CreateExecuteConsumer() *kafka.Reader {
+	return kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  []string{models.KafkaAddress},
+		GroupID:  models.KafkaConsumerExecute,
+		Topic:    models.KafkaTopicExecute,
+		MinBytes: 10e3, // 10KB
+		MaxBytes: 10e6, // 10MB
+	})
+}

@@ -22,7 +22,7 @@ func init() {
 		log.Panic(err)
 	}
 	client = NewDispatchServiceClient(conn)
-	log.Printf("init dispatch client success...")
+	log.Printf("init dispatch grpc client success...")
 	return
 }
 

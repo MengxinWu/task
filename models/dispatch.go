@@ -1,7 +1,8 @@
 package models
 
 const (
-	DispatchEventResourceAdd = "resource_add"
+	DispatchEventResourceAdd   = "resource_add"
+	DispatchEventProcessorDone = "processor_done" // 任务完成包含任务成功和失败
 )
 
 type DispatchEvent struct {
