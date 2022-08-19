@@ -3,6 +3,8 @@ package dispatch
 import (
 	"context"
 
+	"task/ecode"
+
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -48,7 +50,7 @@ func Dispatch(ctx context.Context, event string, resourceId int64, dagId, proces
 	resp, err := client.Dispatch(ctx, req)
 	if err != nil {
 		log.Errorf("dispatch rpc error: %v", err)
-		return nil, err
+		return nil, ecode.RPCError
 	}
 	log.Printf("dispatch rpc result: %s", resp)
 	return resp.ProcessorIdList, nil

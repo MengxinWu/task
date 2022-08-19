@@ -4,36 +4,58 @@ import (
 	"context"
 	"time"
 
+	"task/ecode"
 	"task/models"
 
 	log "github.com/sirupsen/logrus"
 )
 
-// GetProcessState get process state.
-func GetProcessState(ctx context.Context, resourceId int64, processorId int) (*models.ResourceState, error) {
-	// todo
-	return nil, nil
+// GetResourceProcessState get resource process state.
+func GetResourceProcessState(_ context.Context, resourceId int64, processorId int) (*models.ResourceProcessState, error) {
+	var (
+		ok  bool
+		err error
+	)
+	state := new(models.ResourceProcessState)
+	if ok, err = engine.Where("resource_id = ? AND processor_id = ?", resourceId, processorId).Get(state); err != nil {
+		log.Errorf("GetResourceProcessState engine error: %v", err)
+		return nil, ecode.EngineError
+	}
+	if !ok {
+		return nil, ecode.ProcessStateNotFound
+	}
+	return state, nil
 }
 
-// AddProcessState add process state.
-func AddProcessState(_ context.Context, resourceId int64, processorId, processState int) error {
+// AddResourceProcessState add resource process state.
+func AddResourceProcessState(_ context.Context, resourceId int64, processorId, processState, processCnt int, processMsg string) error {
 	var err error
-	state := &models.ResourceState{
+	state := &models.ResourceProcessState{
 		ResourceId:   resourceId,
 		ProcessorId:  processorId,
+		ProcessCnt:   processCnt,
 		ProcessState: processState,
+		ProcessMsg:   processMsg,
 		CreateTime:   time.Now(),
 		UpdateTime:   time.Now(),
 	}
 	if _, err = engine.Insert(state); err != nil {
-		log.Errorf("AddProcessState engine error: %v", err)
-		return err
+		log.Errorf("AddResourceProcessState engine error: %v", err)
+		return ecode.EngineError
 	}
 	return nil
 }
 
-// UpdateProcessState update process state.
-func UpdateProcessState(ctx context.Context, resourceId int64, processorId, processState int) error {
-	// todo
+// UpdateResourceProcessState update resource process state.
+func UpdateResourceProcessState(_ context.Context, id, processState, processCnt int, processMsg string) error {
+	var err error
+	state := new(models.ResourceProcessState)
+	state.ProcessCnt = processCnt
+	state.ProcessState = processState
+	state.ProcessMsg = processMsg
+	if _, err = engine.Id(id).Cols("process_cnt", "process_state", "process_msg").Update(state); err != nil {
+		log.Errorf("UpdateResourceProcessState engine error: %v", err)
+		return ecode.EngineError
+	}
 	return nil
 }

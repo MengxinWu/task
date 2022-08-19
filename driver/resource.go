@@ -2,7 +2,7 @@ package driver
 
 import (
 	"context"
-	"fmt"
+	"task/ecode"
 	"time"
 
 	"task/models"
@@ -35,12 +35,12 @@ func GetResource(_ context.Context, resourceId int64) (*models.Resource, error) 
 		err error
 	)
 	resource := new(models.Resource)
-	if ok, err = engine.Id(resourceId).Get(resource); err != nil {
+	if ok, err = engine.Id(resourceId).Where("status != ?", models.ResourceStatusDelete).Get(resource); err != nil {
 		log.Errorf("GetResource engine error: %v", err)
-		return nil, err
+		return nil, ecode.EngineError
 	}
 	if !ok {
-		return nil, fmt.Errorf("not exist resource %d", resourceId)
+		return nil, ecode.ResourceNotFound
 	}
 	return resource, nil
 }

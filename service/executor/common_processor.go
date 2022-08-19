@@ -1,13 +1,17 @@
-package executor
+package service
 
 import (
 	"context"
-	"fmt"
+	"math/rand"
 	"time"
 
 	"task/driver"
+	"task/ecode"
 	"task/models"
 	"task/pb/dispatch"
+	"task/utils"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type CommonProcessor struct {
@@ -20,36 +24,44 @@ func (p CommonProcessor) Prepare(ctx context.Context, event *models.ExecuteEvent
 		return err
 	}
 	// 检查处理状态
-	if event.ResourceState, err = driver.GetProcessState(ctx, event.ResourceId, event.ProcessorId); err != nil {
+	if event.ResourceProcessState, err = driver.GetResourceProcessState(ctx, event.ResourceId, event.ProcessorId); err != nil {
 		return err
 	}
-	event.ProcessState = event.ResourceState.ProcessState
+	event.ProcessState = event.ResourceProcessState.ProcessState
+	event.ProcessCnt = event.ResourceProcessState.ProcessCnt
 	if event.ProcessState != models.ProcessStateReady {
-		return fmt.Errorf("resource(%d) processor(%d) state(%d) is not ready", event.ResourceId, event.ProcessorId, event.ProcessState)
+		log.Errorf("resource(%d) processor(%d) state(%d) is not ready", event.ResourceId, event.ProcessorId, event.ProcessState)
+		return ecode.ProcessStateWrong
 	}
-	// 更新处理状态为运行中
+	// 更新处理状态 处理中
 	event.ProcessState = models.ProcessStateRunning
-	if err = driver.UpdateProcessState(ctx, event.ResourceId, event.ProcessorId, event.ProcessState); err != nil {
+	event.ProcessCnt += 1
+	if err = driver.UpdateResourceProcessState(ctx, event.ResourceProcessState.Id, event.ProcessState, event.ProcessCnt, ""); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (p CommonProcessor) Execute(ctx context.Context, event *models.ExecuteEvent) error {
-	// 空等
+func (p CommonProcessor) Execute(_ context.Context, event *models.ExecuteEvent) error {
+	// 测试任务
 	time.Sleep(3 * time.Second)
+	// 80%概率成功
 	event.ProcessState = models.ProcessStateSuccess
+	rand.Seed(time.Now().UnixNano())
+	if rand.Intn(100) > 80 {
+		event.ProcessState = models.ProcessStateFail
+	}
 	return nil
 }
 
 func (p CommonProcessor) After(ctx context.Context, event *models.ExecuteEvent) error {
 	var err error
 	// 更新处理结果
-	if err = driver.UpdateProcessState(ctx, event.ResourceId, event.ProcessorId, event.ProcessState); err != nil {
+	if err = driver.UpdateResourceProcessState(ctx, event.ResourceProcessState.Id, event.ProcessState, event.ProcessCnt, event.ProcessMsg); err != nil {
 		return err
 	}
-	// 当处理结果为finish和fail时 发起任务调度
-	if event.ProcessState == models.ProcessStateSuccess || event.ProcessState == models.ProcessStateFail {
+	// 当处理结果为success和fail时 发起任务调度
+	if utils.IntInSlice(event.ProcessState, []int{models.ProcessStateSuccess, models.ProcessStateFail}) {
 		if _, err = dispatch.Dispatch(ctx, models.DispatchEventProcessorDone, event.ResourceId, event.Resource.DagId, event.ProcessorId); err != nil {
 			return err
 		}

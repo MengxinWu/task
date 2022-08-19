@@ -6,7 +6,7 @@ import (
 
 	"task/driver"
 	pb "task/pb/dispatch"
-	service "task/service/dispatch"
+	"task/service/dispatch"
 
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"

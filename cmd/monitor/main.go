@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
+	"task/driver"
 	"task/models"
 	"task/pb/dispatch"
 
@@ -12,34 +13,32 @@ import (
 )
 
 func main() {
-	// 创建kafka reader
-	r := kafka.NewReader(kafka.ReaderConfig{
-		Brokers:  []string{models.KafkaAddress},
-		GroupID:  models.KafkaConsumerDispatch,
-		Topic:    models.KafkaTopicDispatch,
-		MinBytes: 10e3, // 10KB
-		MaxBytes: 10e6, // 10MB
-	})
-
-	// 监听kafka消息(调度)
+	var err error
+	// 监听调度事件消息 - kafka
+	r := driver.CreateDispatchConsumer()
 	for {
-		ctx := context.Background()
-		m, err := r.ReadMessage(ctx)
-		if err != nil {
+		var (
+			ctx = context.Background()
+			m   kafka.Message
+		)
+		// 接受消息
+		if m, err = r.ReadMessage(ctx); err != nil {
+			log.Errorf("receive dispatch message error: %v", err)
 			break
 		}
-		log.Printf("message at topic/partition/offset %v/%v/%v: %s = %s", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+		log.Printf("receive dispatch message: %s", string(m.Value))
+		// 解析消息
 		event := new(models.DispatchEvent)
 		if err = json.Unmarshal(m.Value, &event); err != nil {
 			log.Errorf("message unmarshal error: %v", err)
 			break
 		}
-		// 调用调度rpc接口
+		// 调用调度接口
 		if _, err = dispatch.Dispatch(ctx, event.Event, event.ResourceId, event.DagId, event.ProcessorId); err != nil {
 			return
 		}
 	}
-	if err := r.Close(); err != nil {
-		log.Fatal("failed to close reader:", err)
+	if err = r.Close(); err != nil {
+		log.Panic(err)
 	}
 }

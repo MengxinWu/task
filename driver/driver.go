@@ -104,6 +104,17 @@ func InitExecuteConn() {
 	return
 }
 
+// CreateDispatchConsumer create dispatch consumer.
+func CreateDispatchConsumer() *kafka.Reader {
+	return kafka.NewReader(kafka.ReaderConfig{
+		Brokers:  []string{models.KafkaAddress},
+		GroupID:  models.KafkaConsumerDispatch,
+		Topic:    models.KafkaTopicDispatch,
+		MinBytes: 10e3, // 10KB
+		MaxBytes: 10e6, // 10MB
+	})
+}
+
 // CreateExecuteConsumer create execute consumer.
 func CreateExecuteConsumer() *kafka.Reader {
 	return kafka.NewReader(kafka.ReaderConfig{

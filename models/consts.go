@@ -1,10 +1,16 @@
 package models
 
 const (
+	// resource
+	ResourceStatusNormal = 0
+	ResourceStatusDelete = -1
+
+	// dag
 	DagStatusDelete = -1
 
-	ResourceStatusNormal = 0
-	ResourceStatusDELETE = -1
+	// processor
+	ProcessorStatusNormal = int(0)
+	ProcessorStatusDelete = int(-1)
 
 	ProcessStateInit    = 0
 	ProcessStateReady   = 100

@@ -1,4 +1,4 @@
-package dispatch
+package service
 
 import (
 	"context"
@@ -45,7 +45,7 @@ func (h ResourceAddHandler) Compute(ctx context.Context, event *models.DispatchE
 		if node.Parents == nil {
 			event.ExecutorList = append(event.ExecutorList, int64(node.ProcessorId))
 			// 设置处理状态为等待执行
-			if err = driver.AddProcessState(ctx, event.ResourceId, node.ProcessorId, models.ProcessStateReady); err != nil {
+			if err = driver.AddResourceProcessState(ctx, event.ResourceId, node.ProcessorId, models.ProcessStateReady, 0, ""); err != nil {
 				return err
 			}
 		}
