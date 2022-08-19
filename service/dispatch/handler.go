@@ -141,17 +141,16 @@ func (h ProcessorDoneHandler) Compute(ctx context.Context, event *models.Dispatc
 				break
 			}
 		}
-		if ready {
-			if processState, err = driver.GetResourceProcessState(ctx, event.ResourceId, childrenNode.ProcessorId); err != nil {
+		if !ready {
+			continue
+		}
+		_, err = driver.GetResourceProcessState(ctx, event.ResourceId, childrenNode.ProcessorId)
+		if err == ecode.ProcessStateNotFound {
+			err = nil
+			// 设置处理状态为等待执行
+			event.ExecutorList = append(event.ExecutorList, int64(childrenNode.ProcessorId))
+			if err = driver.AddResourceProcessState(ctx, event.ResourceId, childrenNode.ProcessorId, models.ProcessStateReady, 0, ""); err != nil {
 				return err
-			}
-			if err == ecode.ProcessStateNotFound {
-				err = nil
-				// 设置处理状态为等待执行
-				event.ExecutorList = append(event.ExecutorList, int64(childrenNode.ProcessorId))
-				if err = driver.AddResourceProcessState(ctx, event.ResourceId, childrenNode.ProcessorId, models.ProcessStateReady, 0, ""); err != nil {
-					return err
-				}
 			}
 		}
 	}
