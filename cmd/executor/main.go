@@ -16,6 +16,7 @@ func main() {
 	var err error
 	// 初始化资源
 	driver.InitEngine()
+	driver.InitDispatchConn()
 	// 初始化执行处理器
 	service.InitExecutorHandler()
 	// 监听执行事件

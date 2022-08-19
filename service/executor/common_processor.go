@@ -8,7 +8,6 @@ import (
 	"task/driver"
 	"task/ecode"
 	"task/models"
-	"task/pb/dispatch"
 	"task/utils"
 
 	log "github.com/sirupsen/logrus"
@@ -62,7 +61,13 @@ func (p CommonProcessor) After(ctx context.Context, event *models.ExecuteEvent) 
 	}
 	// 当处理结果为success和fail时 发起任务调度
 	if utils.IntInSlice(event.ProcessState, []int{models.ProcessStateSuccess, models.ProcessStateFail}) {
-		if _, err = dispatch.Dispatch(ctx, models.DispatchEventProcessorDone, event.ResourceId, event.Resource.DagId, event.ProcessorId); err != nil {
+		// 进入调度消息队列 等待调度
+		if err = driver.SendDispatchEventMsg(&models.DispatchEvent{
+			Event:       models.DispatchEventProcessorDone,
+			ResourceId:  event.ResourceId,
+			DagId:       event.Resource.DagId,
+			ProcessorId: event.ProcessorId,
+		}); err != nil {
 			return err
 		}
 	}
