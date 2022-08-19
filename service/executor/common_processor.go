@@ -48,7 +48,7 @@ func (p CommonProcessor) Execute(_ context.Context, event *models.ExecuteEvent) 
 	// 80%概率成功
 	event.ProcessState = models.ProcessStateSuccess
 	rand.Seed(time.Now().UnixNano())
-	if rand.Intn(100) > 80 {
+	if rand.Intn(100) > 50 {
 		event.ProcessState = models.ProcessStateFail
 	}
 	return nil

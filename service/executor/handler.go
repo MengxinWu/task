@@ -43,7 +43,7 @@ func getExecutorHandler(name string) (ExecutorHandler, error) {
 
 // processExecuteEvent process execute event.
 func processExecuteEvent(ctx context.Context, event *models.ExecuteEvent) error {
-	log.Infof("resource:%d processor:%d start execute...", event.ResourceId, event.ProcessorId)
+	log.Infof("process start with resource:%d processor:%d", event.ResourceId, event.ProcessorId)
 	var (
 		hdl ExecutorHandler
 		err error
@@ -68,6 +68,7 @@ func processExecuteEvent(ctx context.Context, event *models.ExecuteEvent) error 
 	if err = hdl.After(ctx, event); err != nil {
 		return err
 	}
+	log.Infof("process end with resource:%d processor:%d state:%d", event.ResourceId, event.ProcessorId, event.ProcessState)
 	return nil
 }
 
