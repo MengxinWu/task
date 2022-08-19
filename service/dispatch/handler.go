@@ -92,8 +92,8 @@ func (h ProcessorDoneHandler) Prepare(ctx context.Context, event *models.Dispatc
 		return err
 	}
 	if event.ResourceProcessState.ProcessCnt >= models.MaxRetryCnt {
-		log.Errorf("process count(%d) over limit", event.ResourceProcessState.ProcessCnt)
-		return ecode.ProcessRetryCntOver
+		log.Warnf("process count(%d) over limit", event.ResourceProcessState.ProcessCnt)
+		return nil
 	}
 	return nil
 }
