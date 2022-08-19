@@ -12,9 +12,10 @@ type DispatchEvent struct {
 	DagId       int    `json:"dag_id"`
 	ProcessorId int    `json:"processor_id"`
 	// 中间计算使用变量
-	Resource *Resource `json:"-"`
-	Dag      *Dag      `json:"-"`
-	Graph    Graph     `json:"-"`
+	Resource     *Resource     `json:"-"`
+	Dag          *Dag          `json:"-"`
+	ProcessState *ProcessState `json:"-"`
+	Graph        Graph         `json:"-"`
 	// 调度结果
 	ExecutorList []int64 `json:"-"`
 }
