@@ -37,7 +37,7 @@ func GenerateGraph(dagConfig string) (Graph, error) {
 	if err = json.Unmarshal([]byte(dagConfig), &config); err != nil {
 		return nil, err
 	}
-	log.Printf("dag config: %+v", config)
+	log.Printf("dag config: %", config)
 	dag := make(Graph)
 	for _, processorId := range config.Processors {
 		dag.AddNode(processorId)

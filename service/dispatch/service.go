@@ -6,6 +6,7 @@ import (
 	"task/models"
 	pb "task/pb/dispatch"
 
+	log "github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -30,6 +31,8 @@ func (s *server) Dispatch(ctx context.Context, req *pb.DispatchRequest) (*pb.Dis
 		DagId:       int(req.DagId),
 		ProcessorId: int(req.ProcessorId),
 	}
+	log.Infof("dispatch start info; event: %s, resourse_id: %d, dag_id: %d, processor_id: %d",
+		req.Event, req.ResourceId, req.DagId, req.ProcessorId)
 
 	if hdl, ok = DispatchHandlerMap[req.Event]; !ok {
 		return nil, fmt.Errorf("event not exist: %s", req.Event)
@@ -46,6 +49,8 @@ func (s *server) Dispatch(ctx context.Context, req *pb.DispatchRequest) (*pb.Dis
 	if err = hdl.After(ctx, dispatchEvent); err != nil {
 		return nil, err
 	}
+
+	log.Infof("dispatch end info: %+v", dispatchEvent.ExecutorList)
 
 	return &pb.DispatchResponse{
 		ProcessorIdList: dispatchEvent.ExecutorList,
