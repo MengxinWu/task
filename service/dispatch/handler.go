@@ -85,7 +85,7 @@ func (h ProcessorDoneHandler) Prepare(ctx context.Context, event *models.Dispatc
 	if event.Resource, err = driver.GetResource(ctx, event.ResourceId); err != nil {
 		return err
 	}
-	if event.ProcessState, err = driver.GetProcessState(ctx, event.ResourceId, event.ProcessorId); err != nil {
+	if event.ResourceProcessState, err = driver.GetProcessState(ctx, event.ResourceId, event.ProcessorId); err != nil {
 		return err
 	}
 	return nil
@@ -96,11 +96,11 @@ func (h ProcessorDoneHandler) Compute(ctx context.Context, event *models.Dispatc
 		err      error
 		children []*models.Node
 	)
-	if event.ProcessState.ProcessorCnt >= 4 {
-		return fmt.Errorf("process state cnt > 4 (%d)", event.ProcessState.ProcessorCnt)
+	if event.ResourceProcessState.ProcessorCnt >= 4 {
+		return fmt.Errorf("process state cnt > 4 (%d)", event.ResourceProcessState.ProcessorCnt)
 	}
 	// 失败任务重试
-	if event.ProcessState.ProcessState != 400 {
+	if event.ResourceProcessState.ProcessState != 400 {
 		log.Printf("process execute unsuccess %d, %d, retrying...", event.ResourceId, event.ProcessorId)
 		event.ExecutorList = append(event.ExecutorList, int64(event.ProcessorId))
 		// 设置处理状态为等待执行
