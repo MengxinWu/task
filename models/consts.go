@@ -1,6 +1,7 @@
 package models
 
 const (
+	DagStatusNormal = 0
 	DagStatusDelete = -1
 
 	ResourceStatusNormal = 0
