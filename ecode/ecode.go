@@ -28,9 +28,11 @@ var (
 
 	// dag & processor 3000 ~ 3999
 	ProcessorNotFound = New(3001, "处理单元不存在")
+	ProcessorNotInDag = New(3002, "处理单元不在DAG")
 
 	// process 4000 ~ 4999
 	ExecutorHandlerNotFound = New(4001, "执行处理器不存在")
 	ProcessStateNotFound    = New(4002, "处理状态不存在")
 	ProcessStateWrong       = New(4003, "处理状态错误")
+	ProcessRetryCntOver     = New(4004, "处理次数超过最大值")
 )

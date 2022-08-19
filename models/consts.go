@@ -18,6 +18,8 @@ const (
 	ProcessStateSuccess = 400
 	ProcessStateFail    = 500
 	ProcessStateError   = 600
+
+	MaxRetryCnt = int(4)
 )
 
 const (

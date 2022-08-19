@@ -2,9 +2,9 @@ package service
 
 import (
 	"context"
-	"fmt"
 
 	"task/driver"
+	"task/ecode"
 	"task/models"
 
 	log "github.com/sirupsen/logrus"
@@ -88,6 +88,10 @@ func (h ProcessorDoneHandler) Prepare(ctx context.Context, event *models.Dispatc
 	if event.ResourceProcessState, err = driver.GetResourceProcessState(ctx, event.ResourceId, event.ProcessorId); err != nil {
 		return err
 	}
+	if event.ResourceProcessState.ProcessCnt >= models.MaxRetryCnt {
+		log.Errorf("process count(%d) over limit", event.ResourceProcessState.ProcessCnt)
+		return ecode.ProcessRetryCntOver
+	}
 	return nil
 }
 
@@ -97,34 +101,27 @@ func (h ProcessorDoneHandler) Compute(ctx context.Context, event *models.Dispatc
 		children     []*models.Node
 		err          error
 	)
-	if event.ResourceProcessState.ProcessCnt >= 4 {
-		return fmt.Errorf("process state cnt > 4 (%d)", event.ResourceProcessState.ProcessCnt)
-	}
 	// 失败任务重试
-	if event.ResourceProcessState.ProcessState != 400 {
-		if event.ResourceProcessState.ProcessState != models.ProcessStateSuccess {
-			log.Printf("process execute unsuccess %d, %d, retrying...", event.ResourceId, event.ProcessorId)
-			event.ExecutorList = append(event.ExecutorList, int64(event.ProcessorId))
-			// 设置处理状态为等待执行
-			if err = driver.UpdateResourceProcessState(ctx, event.ResourceProcessState.Id, models.ProcessStateReady,
-				event.ResourceProcessState.ProcessCnt, ""); err != nil {
-				return err
-			}
-			return nil
+	if event.ResourceProcessState.ProcessState == models.ProcessStateFail {
+		log.Printf("process execute fail %d, %d, retrying...", event.ResourceId, event.ProcessorId)
+		event.ExecutorList = append(event.ExecutorList, int64(event.ProcessorId))
+		// 设置处理状态为等待执行
+		if err = driver.UpdateResourceProcessState(ctx, event.ResourceProcessState.Id, models.ProcessStateReady,
+			event.ResourceProcessState.ProcessCnt, ""); err != nil {
+			return err
 		}
+		return nil
 	}
 	// 寻找下游节点的上游节点
 	// 生成DAG图
 	if event.Graph, err = models.GenerateGraph(event.Dag.Config); err != nil {
 		return err
 	}
-	// 寻找children节点
-	for _, node := range event.Graph {
-		if node.ProcessorId == event.ProcessorId {
-			children = node.Children
-		}
+	if _, ok := event.Graph[event.ProcessorId]; !ok {
+		log.Errorf("process processor id: %d not in dag", event.ProcessorId)
+		return ecode.ProcessorNotInDag
 	}
-	if children == nil {
+	if children = event.Graph[event.ProcessorId].Children; children == nil {
 		return nil
 	}
 	for _, childrenNode := range children {
@@ -143,6 +140,7 @@ func (h ProcessorDoneHandler) Compute(ctx context.Context, event *models.Dispatc
 		}
 		if ready {
 			// 设置处理状态为等待执行
+			event.ExecutorList = append(event.ExecutorList, int64(childrenNode.ProcessorId))
 			if err = driver.AddResourceProcessState(ctx, event.ResourceId, childrenNode.ProcessorId, models.ProcessStateReady, 0, ""); err != nil {
 				return err
 			}
