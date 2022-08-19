@@ -34,9 +34,7 @@ func main() {
 			break
 		}
 		// 调用调度接口
-		if _, err = dispatch.Dispatch(ctx, event.Event, event.ResourceId, event.DagId, event.ProcessorId); err != nil {
-			return
-		}
+		_, _ = dispatch.Dispatch(ctx, event.Event, event.ResourceId, event.DagId, event.ProcessorId)
 	}
 	if err = r.Close(); err != nil {
 		log.Panic(err)
