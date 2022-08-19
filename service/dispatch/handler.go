@@ -85,7 +85,7 @@ func (h ProcessorDoneHandler) Prepare(ctx context.Context, event *models.Dispatc
 	if event.Resource, err = driver.GetResource(ctx, event.ResourceId); err != nil {
 		return err
 	}
-	if event.ResourceProcessState, err = driver.GetProcessState(ctx, event.ResourceId, event.ProcessorId); err != nil {
+	if event.ResourceProcessState, err = driver.GetResourceProcessState(ctx, event.ResourceId, event.ProcessorId); err != nil {
 		return err
 	}
 	return nil
@@ -93,19 +93,24 @@ func (h ProcessorDoneHandler) Prepare(ctx context.Context, event *models.Dispatc
 
 func (h ProcessorDoneHandler) Compute(ctx context.Context, event *models.DispatchEvent) error {
 	var (
-		err      error
-		children []*models.Node
+		processState *models.ResourceProcessState
+		children     []*models.Node
+		err          error
 	)
-	if event.ResourceProcessState.ProcessorCnt >= 4 {
-		return fmt.Errorf("process state cnt > 4 (%d)", event.ResourceProcessState.ProcessorCnt)
+	if event.ResourceProcessState.ProcessCnt >= 4 {
+		return fmt.Errorf("process state cnt > 4 (%d)", event.ResourceProcessState.ProcessCnt)
 	}
 	// 失败任务重试
 	if event.ResourceProcessState.ProcessState != 400 {
-		log.Printf("process execute unsuccess %d, %d, retrying...", event.ResourceId, event.ProcessorId)
-		event.ExecutorList = append(event.ExecutorList, int64(event.ProcessorId))
-		// 设置处理状态为等待执行
-		if err = driver.AddProcessState(ctx, event.ResourceId, event.ProcessorId, models.ProcessStateReady); err != nil {
-			return err
+		if event.ResourceProcessState.ProcessState != models.ProcessStateSuccess {
+			log.Printf("process execute unsuccess %d, %d, retrying...", event.ResourceId, event.ProcessorId)
+			event.ExecutorList = append(event.ExecutorList, int64(event.ProcessorId))
+			// 设置处理状态为等待执行
+			if err = driver.UpdateResourceProcessState(ctx, event.ResourceProcessState.Id, models.ProcessStateReady,
+				event.ResourceProcessState.ProcessCnt, ""); err != nil {
+				return err
+			}
+			return nil
 		}
 	}
 	// 寻找下游节点的上游节点
@@ -120,7 +125,28 @@ func (h ProcessorDoneHandler) Compute(ctx context.Context, event *models.Dispatc
 		}
 	}
 	if children == nil {
-
+		return nil
+	}
+	for _, childrenNode := range children {
+		ready := true
+		for _, node := range childrenNode.Parents {
+			if node.ProcessorId == event.ProcessorId {
+				continue
+			}
+			if processState, err = driver.GetResourceProcessState(ctx, event.ResourceId, node.ProcessorId); err != nil {
+				return err
+			}
+			if processState.ProcessState != models.ProcessStateSuccess {
+				ready = false
+				break
+			}
+		}
+		if ready {
+			// 设置处理状态为等待执行
+			if err = driver.AddResourceProcessState(ctx, event.ResourceId, childrenNode.ProcessorId, models.ProcessStateReady, 0, ""); err != nil {
+				return err
+			}
+		}
 	}
 	return nil
 }
