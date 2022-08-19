@@ -17,7 +17,7 @@ func GetProcessor(_ context.Context, processorId int) (*models.Processor, error)
 	)
 	processor := new(models.Processor)
 	if ok, err = engine.Id(processorId).Where("status != ?", models.ProcessorStatusDelete).Get(processor); err != nil {
-		log.Errorf("GetProcessState engine error: %v", err)
+		log.Errorf("GetProcessor engine error: %v", err)
 		return nil, ecode.EngineError
 	}
 	if !ok {
