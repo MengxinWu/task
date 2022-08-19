@@ -29,10 +29,10 @@ func main() {
 		)
 		// 接受消息
 		if m, err = r.ReadMessage(ctx); err != nil {
-			log.Errorf("receive executor message error: %v", err)
+			log.Errorf("kafka receive executor message error: %v", err)
 			break
 		}
-		log.Printf("receive executor message: %s", string(m.Value))
+		log.Printf("kafak receive executor message: %s", string(m.Value))
 		// 解析消息
 		event := new(models.ExecuteEvent)
 		if err = json.Unmarshal(m.Value, &event); err != nil {
