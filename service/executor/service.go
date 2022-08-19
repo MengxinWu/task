@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	log "github.com/sirupsen/logrus"
 
 	"task/models"
 )
@@ -21,6 +22,7 @@ func ListenExecuteEvent() {
 	for {
 		select {
 		case event := <-executeEventCh:
+			log.Infof("channel len: %d", len(executeEventCh))
 			var ctx = context.Background()
 			// 处理执行事件
 			if err := processExecuteEvent(ctx, event); err != nil {
