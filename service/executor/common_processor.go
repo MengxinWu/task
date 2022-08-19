@@ -44,7 +44,7 @@ func (p CommonProcessor) Prepare(ctx context.Context, event *models.ExecuteEvent
 
 func (p CommonProcessor) Execute(_ context.Context, event *models.ExecuteEvent) error {
 	// 测试任务
-	time.Sleep(3 * time.Second)
+	time.Sleep(5 * time.Second)
 	// 80%概率成功
 	event.ProcessState = models.ProcessStateSuccess
 	rand.Seed(time.Now().UnixNano())
