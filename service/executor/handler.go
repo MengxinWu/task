@@ -22,9 +22,6 @@ func InitHandler() {
 	HandlerMap["processor2"] = CommonProcessor{}
 	HandlerMap["processor3"] = CommonProcessor{}
 	HandlerMap["processor4"] = CommonProcessor{}
-	HandlerMap["processor5"] = CommonProcessor{}
-	HandlerMap["processor6"] = CommonProcessor{}
-	HandlerMap["processor7"] = CommonProcessor{}
 }
 
 // run run.
