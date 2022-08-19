@@ -85,6 +85,9 @@ func (h ProcessorDoneHandler) Prepare(ctx context.Context, event *models.Dispatc
 	if event.Resource, err = driver.GetResource(ctx, event.ResourceId); err != nil {
 		return err
 	}
+	if event.Dag, err = driver.GetDag(ctx, event.Resource.DagId); err != nil {
+		return err
+	}
 	if event.ResourceProcessState, err = driver.GetResourceProcessState(ctx, event.ResourceId, event.ProcessorId); err != nil {
 		return err
 	}
