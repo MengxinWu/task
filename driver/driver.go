@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"task/models"
+	"time"
 
 	"github.com/bwmarrin/snowflake"
 	"github.com/go-redis/redis/v8"
@@ -112,6 +113,7 @@ func CreateDispatchConsumer() *kafka.Reader {
 		Topic:    models.KafkaTopicDispatch,
 		MinBytes: 10e3, // 10KB
 		MaxBytes: 10e6, // 10MB
+		MaxWait:  time.Second,
 	})
 }
 
@@ -123,5 +125,6 @@ func CreateExecuteConsumer() *kafka.Reader {
 		Topic:    models.KafkaTopicExecute,
 		MinBytes: 10e3, // 10KB
 		MaxBytes: 10e6, // 10MB
+		MaxWait:  time.Second,
 	})
 }
