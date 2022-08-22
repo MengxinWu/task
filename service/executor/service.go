@@ -24,11 +24,12 @@ func ReceiveExecuteEvent(event *models.ExecuteEvent) {
 // ListenExecuteEvent listen execute event.
 func ListenExecuteEvent() {
 	for i := 0; i < workerNum; i++ {
+		workerIdx := i
 		go func() {
 			for {
 				select {
 				case event := <-executeEventCh:
-					log.Infof("worker num: %d, channel len: %d", workerNum, len(executeEventCh))
+					log.Infof("worker num: %d, channel len: %d", workerIdx, len(executeEventCh))
 					var ctx = context.Background()
 					// 处理执行事件
 					if err := processExecuteEvent(ctx, event); err != nil {
