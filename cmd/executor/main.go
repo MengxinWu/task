@@ -20,7 +20,7 @@ func main() {
 	// 初始化执行处理器
 	service.InitExecutorHandler()
 	// 监听执行事件
-	go service.ListenExecuteEvent()
+	service.ListenExecuteEvent()
 	// 监听执行事件消息 - kafka
 	r := driver.CreateExecuteConsumer()
 	for {
