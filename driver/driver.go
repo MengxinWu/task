@@ -3,6 +3,7 @@ package driver
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"task/models"
 	"time"
 
@@ -85,7 +86,9 @@ func InitDispatchConn() {
 		ctx = context.Background()
 		err error
 	)
-	if dispatchConn, err = kafka.DialLeader(ctx, "tcp", models.KafkaAddress, models.KafkaTopicDispatch, 0); err != nil {
+	rand.Seed(time.Now().UnixNano())
+	p := rand.Intn(1)
+	if dispatchConn, err = kafka.DialLeader(ctx, "tcp", models.KafkaAddress, models.KafkaTopicDispatch, p); err != nil {
 		log.Panic(err)
 	}
 	log.Printf("init dispatch conn success...")
@@ -98,7 +101,9 @@ func InitExecuteConn() {
 		ctx = context.Background()
 		err error
 	)
-	if executeConn, err = kafka.DialLeader(ctx, "tcp", models.KafkaAddress, models.KafkaTopicExecute, 0); err != nil {
+	rand.Seed(time.Now().UnixNano())
+	p := rand.Intn(1)
+	if executeConn, err = kafka.DialLeader(ctx, "tcp", models.KafkaAddress, models.KafkaTopicExecute, p); err != nil {
 		log.Panic(err)
 	}
 	log.Printf("init execute conn success...")
