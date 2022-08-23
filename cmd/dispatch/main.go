@@ -15,7 +15,7 @@ import (
 func main() {
 	// 初始化资源
 	driver.InitEngine()
-	driver.InitExecuteConn()
+	driver.InitExecuteWriter()
 
 	// 初始化调度管理器
 	service.InitDispatchHandler()

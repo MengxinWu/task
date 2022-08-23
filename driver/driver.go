@@ -3,7 +3,6 @@ package driver
 import (
 	"context"
 	"fmt"
-	"math/rand"
 	"task/models"
 	"time"
 
@@ -16,11 +15,11 @@ import (
 )
 
 var (
-	engine       *xorm.Engine
-	client       *redis.Client
-	node         *snowflake.Node
-	dispatchConn *kafka.Conn
-	executeConn  *kafka.Conn
+	engine         *xorm.Engine
+	client         *redis.Client
+	node           *snowflake.Node
+	dispatchWriter *kafka.Writer
+	executeWriter  *kafka.Writer
 )
 
 // InitEngine init engine.
@@ -80,33 +79,23 @@ func GetSnowFlakeId() int64 {
 	return node.Generate().Int64()
 }
 
-// InitDispatchConn init dispatch conn.
-func InitDispatchConn() {
-	var (
-		ctx = context.Background()
-		err error
-	)
-	rand.Seed(time.Now().UnixNano())
-	p := rand.Intn(1)
-	if dispatchConn, err = kafka.DialLeader(ctx, "tcp", models.KafkaAddress, models.KafkaTopicDispatch, p); err != nil {
-		log.Panic(err)
+// InitDispatchWriter init dispatch writer.
+func InitDispatchWriter() {
+	dispatchWriter = &kafka.Writer{
+		Addr:     kafka.TCP(models.KafkaAddress),
+		Topic:    models.KafkaTopicDispatch,
+		Balancer: &kafka.LeastBytes{},
 	}
-	log.Printf("init dispatch conn success...")
 	return
 }
 
-// InitExecuteConn init execute conn.
-func InitExecuteConn() {
-	var (
-		ctx = context.Background()
-		err error
-	)
-	rand.Seed(time.Now().UnixNano())
-	p := rand.Intn(1)
-	if executeConn, err = kafka.DialLeader(ctx, "tcp", models.KafkaAddress, models.KafkaTopicExecute, p); err != nil {
-		log.Panic(err)
+// InitExecuteWriter init execute writer.
+func InitExecuteWriter() {
+	executeWriter = &kafka.Writer{
+		Addr:     kafka.TCP(models.KafkaAddress),
+		Topic:    models.KafkaTopicExecute,
+		Balancer: &kafka.LeastBytes{},
 	}
-	log.Printf("init execute conn success...")
 	return
 }
 

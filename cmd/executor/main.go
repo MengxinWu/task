@@ -16,7 +16,7 @@ func main() {
 	var err error
 	// 初始化资源
 	driver.InitEngine()
-	driver.InitDispatchConn()
+	driver.InitDispatchWriter()
 	// 初始化执行处理器
 	service.InitExecutorHandler()
 	// 监听执行事件
@@ -33,7 +33,7 @@ func main() {
 			log.Errorf("kafka receive executor message error: %v", err)
 			break
 		}
-		log.Printf("kafak receive executor message: %s", string(m.Value))
+		log.Printf("kafak receive executor partition: %d message: %s", m.Partition, string(m.Value))
 		// 解析消息
 		event := new(models.ExecuteEvent)
 		if err = json.Unmarshal(m.Value, &event); err != nil {

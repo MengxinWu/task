@@ -26,7 +26,7 @@ func main() {
 			log.Errorf("receive dispatch message error: %v", err)
 			break
 		}
-		log.Printf("receive dispatch message: %s", string(m.Value))
+		log.Printf("receive dispatch partition: %d message: %s", m.Partition, string(m.Value))
 		// 解析消息
 		event := new(models.DispatchEvent)
 		if err = json.Unmarshal(m.Value, &event); err != nil {

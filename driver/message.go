@@ -1,8 +1,8 @@
 package driver
 
 import (
+	"context"
 	"encoding/json"
-	"time"
 
 	"task/models"
 
@@ -18,8 +18,7 @@ func SendDispatchEventMsg(event *models.DispatchEvent) error {
 	)
 	msg, _ = json.Marshal(event)
 	log.Printf("SendDispatchEventMsg msg: %s", string(msg))
-	_ = dispatchConn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	if _, err = dispatchConn.WriteMessages(
+	if err = dispatchWriter.WriteMessages(context.Background(),
 		kafka.Message{Value: msg},
 	); err != nil {
 		log.Printf("SendDispatchEventMsg send msg error(%v)", err)
@@ -34,14 +33,13 @@ func SendExecuteEventMsg(events []*models.ExecuteEvent) error {
 		msg []byte
 		err error
 	)
-	msgs := make([]kafka.Message, 0)
+	messages := make([]kafka.Message, 0)
 	for _, event := range events {
 		msg, _ = json.Marshal(event)
 		log.Printf("SendExecuteEventMsg msg: %s", string(msg))
-		msgs = append(msgs, kafka.Message{Value: msg})
+		messages = append(messages, kafka.Message{Value: msg})
 	}
-	_ = executeConn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	if _, err = executeConn.WriteMessages(msgs...); err != nil {
+	if err = executeWriter.WriteMessages(context.Background(), messages...); err != nil {
 		log.Printf("SendExecuteEventMsg send msg error(%v)", err)
 		return err
 	}
