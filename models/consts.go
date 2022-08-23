@@ -27,5 +27,5 @@ const (
 	KafkaTopicDispatch    = "dispatch-topic"
 	KafkaTopicExecute     = "execute-topic"
 	KafkaConsumerDispatch = "consumer-group-dispatch"
-	KafkaConsumerExecute  = "consumer-group-execute_02"
+	KafkaConsumerExecute  = "consumer-group-execute"
 )
